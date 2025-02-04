@@ -1,0 +1,35 @@
+name: autoupdater
+run-name: autoupdater
+on:
+  workflow_dispatch:
+  schedule:
+    - cron:  '35 3 * * 0' # 03:35 every sunday
+
+jobs:
+  python_script:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.STARTER_CODE_TOKEN }}
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip' # caching pip dependencies
+
+      - run: pip install -r requirements.txt
+      - run: python updater.py
+
+      - name: Push generated files to target repository
+        uses: cpina/github-action-push-to-another-repository@main
+        env:
+          API_TOKEN_GITHUB: ${{ secrets.PSTARTER_CODE_TOKEN }}
+        with:
+          source-directory: '_work'
+          destination-github-username: 'opendatazurich'
+          destination-repository-name: 'starter-code'
+          target-branch: main
+          commit-message: "Updates"
+          
