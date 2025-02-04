@@ -29,7 +29,7 @@ LANGUAGE = "de"
 
 # Set constants in regard to GitHub account and repo.
 GITHUB_ACCOUNT = "opendatazurich"
-REPO_NAME = "starter-code_opendataswiss"
+REPO_NAME = "starter-code"
 REPO_BRANCH = "main"
 REPO_RMARKDOWN_OUTPUT = "01_r-markdown/"
 REPO_PYTHON_OUTPUT = "02_python/"

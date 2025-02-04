@@ -1,4 +1,4 @@
-name: opendataswiss
+name: opendatazurich
 channels:
   - conda-forge
   - anaconda
