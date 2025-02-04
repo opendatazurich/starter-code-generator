@@ -25,7 +25,7 @@ jobs:
       - name: Push generated files to target repository
         uses: cpina/github-action-push-to-another-repository@main
         env:
-          API_TOKEN_GITHUB: ${{ secrets.PSTARTER_CODE_TOKEN }}
+          API_TOKEN_GITHUB: ${{ secrets.STARTER_CODE_TOKEN }}
         with:
           source-directory: '_work'
           destination-github-username: 'opendatazurich'
