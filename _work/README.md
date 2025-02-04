@@ -12,12 +12,12 @@ This repository provides currently 2 x 20 code files (1 x R, 1 x Python) for all
 
 ⚠️ **Note**: 
 - **GitHub unfortunately doesn't render larger markdown files full length in the repo view.** The GitHub page aka «overview website» (link above) renders the list properly. 
-- Unfortunately you neither won't be able to view all 2.k+ files in the repo folders. Again GitHub truncates file lists longer than 1k files. Files beyond the limit are available but aren't listed. So either clone the repo or select individual files from the [overview website](https://opendatazurich.github.io/starter-code/).
+- Unfortunately you might not be able to view all files in the repo folders. Again GitHub truncates file lists longer than 1k files. Files beyond the limit are available but aren't listed. So either clone the repo or select individual files from the [overview website](https://opendatazurich.github.io/starter-code/).
 
 
 Feedback is always very welcome – simply open an issue! 🙌
 
-<sub>Latest update: **2025-02-04 15:16:54**</sub><br>
+<sub>Latest update: **2025-02-04 17:29:08**</sub><br>
 <sub>For all data licenses please refer to each data set's link (provided in list as well as in the notebooks).</sub>
 
 
