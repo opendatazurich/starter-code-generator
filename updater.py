@@ -424,8 +424,13 @@ def create_overview(data, header):
         )
         if len(title_clean) > TITLE_MAX_CHARS:
             title_clean = title_clean[:TITLE_MAX_CHARS] + "…"
-
-        resource_format = f'{data.loc[idx, PREFIX_RESOURCE_COLS+"filename"]} ({data.loc[idx, PREFIX_RESOURCE_COLS+"format"]})'
+        
+        # filename is empty when format is json
+        if isinstance(data.loc[idx, PREFIX_RESOURCE_COLS+"filename"], str):
+            resource_filename = data.loc[idx, PREFIX_RESOURCE_COLS+"filename"]
+        else:
+            resource_filename = 'No filename provided'
+        resource_format = f'{resource_filename} ({data.loc[idx, PREFIX_RESOURCE_COLS+"format"]})'
         
         ds_link = f'{BASELINK_DATAPORTAL}{data.loc[idx, "name"]}'
         filename = f'{data.loc[idx, "name"]}_{data.loc[idx, PREFIX_RESOURCE_COLS+"id"]}'#data.loc[idx, "id"]
