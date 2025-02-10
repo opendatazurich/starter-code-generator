@@ -17,7 +17,7 @@ Feedback is always very welcome – simply open an issue or contact us at [opend
 <sub>Latest update: **{{ TODAY_DATE }}**</sub><br>
 <sub>For all data licenses please refer to each data set's link (provided in list as well as in the notebooks).</sub>
 
-### Renku: [![launch - renku](https://renkulab.io/renku-badge.svg)](https://renkulab.io/projects/{{ GITHUB_ACCOUNT_REPO }}/sessions/new?autostart=1)
+### Renku (Jupyter Lab / RStudio): [![launch - renku](https://renkulab.io/renku-badge.svg)](https://renkulab.io/v2/projects/{{ GITHUB_ACCOUNT_REPO }})
 ### Jupyter Lab: [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/{{ GITHUB_ACCOUNT_REPO }}/main?urlpath=lab)
 ### RStudio Server: [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/{{ GITHUB_ACCOUNT_REPO }}/main?urlpath=rstudio)
 
