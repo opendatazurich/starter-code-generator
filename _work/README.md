@@ -1,4 +1,4 @@
-# Preconfigured starter code files for all CSV/parquet/geojson datasets of OpenDataZurich
+# Starter code for all CSV/parquet/geojson datasets of OpenDataZurich
 
 ### Open any tabular or geojson dataset of OpenDataZurich with one click and get a fully configured Python Jupyter Notebook or R Markdown file. 
 
@@ -15,9 +15,11 @@ This repository provides currently 2 x 20 code files (1 x R, 1 x Python) for all
 - Unfortunately you might not be able to view all files in the repo folders. Again GitHub truncates file lists longer than 1k files. Files beyond the limit are available but aren't listed. So either clone the repo or select individual files from the [overview website](https://opendatazurich.github.io/starter-code/).
 
 
-Feedback is always very welcome – simply open an issue! 🙌
+Feedback is always very welcome – simply open an issue or contact us at [opendata@zuerich.ch](mailto://opendata@zuerich.ch)! 🙌
 
-<sub>Latest update: **2025-02-04 17:29:08**</sub><br>
+🌻 Our thanks for the [template](https://github.com/rnckp/starter-code-opendataswiss-gh) and help goes to [Patrick Arnecke](https://github.com/rnckp) from the Statistical Office of the Canton of Zurich!
+
+<sub>Latest update: **2025-02-11 13:44:30**</sub><br>
 <sub>For all data licenses please refer to each data set's link (provided in list as well as in the notebooks).</sub>
 
 
