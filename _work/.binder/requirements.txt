@@ -1,0 +1,6 @@
+geopandas
+matplotlib
+missingno
+pandas
+pyarrow
+tqdm
