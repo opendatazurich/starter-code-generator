@@ -1,0 +1,14 @@
+channels:
+  - conda-forge
+dependencies:
+  - python=3.12
+  - geopandas
+  - matplotlib
+  - missingno
+  - pandas
+  - pyarrow
+  - tqdm
+  - r-base
+  - r-tidyverse
+  - r-arrow
+  - r-skimr
