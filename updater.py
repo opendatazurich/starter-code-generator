@@ -363,7 +363,7 @@ def create_rmarkdown(data, notebook_template):
         if "parquet" in file_format:
             load_code = f"""
             library(arrow)
-            df <- arrow::read_parquet("{file_url}")
+            df <- read_parquet("{file_url}")
             """
         else:
             load_code = f"""
