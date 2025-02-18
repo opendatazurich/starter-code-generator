@@ -359,14 +359,17 @@ def create_rmarkdown(data, notebook_template):
         file_format = data.loc[idx, PREFIX_RESOURCE_COLS + "format"].lower()  # Normalize format case
 
         # Add logic to prefer parquet and fallback to csv
-        load_code = f"""
-        library(arrow)
-        if (grepl("parquet", tolower("{file_format}"))) {{
+        # Determine the correct R loading command in Python
+        if "parquet" in file_format:
+            load_code = f"""
+            library(arrow)
             df <- arrow::read_parquet("{file_url}")
-        }} else {{
-            df <- read_delim("{file_url}")
-        }}
-        """
+            """
+        else:
+            load_code = f"""
+            library(readr)
+            df <- read_csv("{file_url}")
+            """
 
         # Finalize the code block
         code_block += f"\n{load_code}"
