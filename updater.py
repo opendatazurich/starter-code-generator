@@ -363,14 +363,53 @@ def create_rmarkdown(data, notebook_template):
 
         # If it's a geospatial RMarkdown template
         if notebook_template == TEMPLATE_RMARKDOWN_GEO:
-            # Check if it's a GeoJSON file
-            if "geojson" in file_url:
-                load_code += f"""library(sf) \ngdf <- st_read("{file_url}")\n"""
-            
-            # Check if there's also a CSV version available
-            elif "csv" in file_format:
-                load_code += f"""library(readr) \ndf <- read_csv("{file_url}")\n"""
+            if "wfs" in file_url:
+                load_code += f"""
+library(httr)
+library(xml2)
+library(sf)
 
+# Get available WFS layers
+wfs_url <- "{file_url}"
+capabilities <- httr::GET(wfs_url, query = list(service = "WFS", version = "1.1.0", request = "GetCapabilities"))
+capabilities_xml <- xml2::read_xml(capabilities$content)
+
+# Extract layers
+layers <- xml2::xml_find_all(capabilities_xml, "//wfs:FeatureType/wfs:Name", xml_ns(capabilities_xml))
+layer_names <- xml2::xml_text(layers)
+print("Available layers:")
+print(layer_names)
+
+# Choose the first layer (like in Python)
+wfs_layer <- layer_names[1]
+print(paste("Chosen WFS layer:", wfs_layer))
+
+# Load WFS data
+gdf <- st_read(wfs_url, layer = wfs_layer)
+"""
+            elif "geojson" in file_url:
+                load_code += f"""
+library(sf)
+
+# Define temporary file path
+temp_file <- tempfile(fileext = ".geojson")
+
+# Download the GeoJSON file
+download.file("{file_url}", temp_file, mode = "wb")
+
+# Read the file with sf::st_read()
+gdf <- st_read(temp_file)
+
+# Remove temporary file after loading
+unlink(temp_file)
+"""
+            elif "csv" in file_format:
+                load_code += f"""
+library(readr)
+
+# Load CSV file
+df <- read_csv("{file_url}")
+"""
             else:
                 load_code += f"""# Unsupported geo format: {file_format}\n"""
 
