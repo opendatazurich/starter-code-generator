@@ -358,12 +358,27 @@ def create_rmarkdown(data, notebook_template):
         file_url = data.loc[idx, PREFIX_RESOURCE_COLS + "url"]
         file_format = data.loc[idx, PREFIX_RESOURCE_COLS + "format"].lower()  # Normalize format case
 
-        # Add logic to prefer parquet and fallback to csv
-        # Determine the correct R loading command in Python
-        if "parquet" in file_format:
-            load_code = f"""library(arrow) \ndf <- read_parquet("{file_url}")"""
+         # Initialize loading code variable
+        load_code = ""
+
+        # If it's a geospatial RMarkdown template
+        if notebook_template == TEMPLATE_RMARKDOWN_GEO:
+            # Check if it's a GeoJSON file
+            if "geojson" in file_url:
+                load_code += f"""library(sf) \ngdf <- st_read("{file_url}")\n"""
+            
+            # Check if there's also a CSV version available
+            elif "csv" in file_format:
+                load_code += f"""library(readr) \ndf <- read_csv("{file_url}")\n"""
+
+            else:
+                load_code += f"""# Unsupported geo format: {file_format}\n"""
+
         else:
-            load_code = f"""library(readr) \ndf <- read_csv("{file_url}")"""
+            if "parquet" in file_format:
+                load_code = f"""library(arrow) \ndf <- read_parquet("{file_url}")"""
+            else:
+                load_code = f"""library(readr) \ndf <- read_csv("{file_url}")"""
 
 
         # Finalize the code block
