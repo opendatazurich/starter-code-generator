@@ -362,13 +362,13 @@ def create_rmarkdown(data, notebook_template):
         # Determine the correct R loading command in Python
         if "parquet" in file_format:
             load_code = f"""
-            library(arrow)
-            df <- read_parquet("{file_url}")
+library(arrow)
+df <- read_parquet("{file_url}")
             """
         else:
             load_code = f"""
-            library(readr)
-            df <- read_csv("{file_url}")
+library(readr)
+df <- read_csv("{file_url}")
             """
 
         # Finalize the code block
