@@ -1,0 +1,26 @@
+{
+    "id": "F511B4BB",
+    "path": "C:/Users/sszmea/R GitLab/starter-code-generator/_templates/template_rmarkdown.Rmd",
+    "project_path": "_templates/template_rmarkdown.Rmd",
+    "type": "r_markdown",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1739871448195.0,
+    "source_on_save": false,
+    "relative_order": 1,
+    "properties": {
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "42,0",
+        "scrollLine": "19"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1739873131,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1739873131349,
+    "read_only": false,
+    "read_only_alternatives": []
+}
