@@ -1,5 +1,6 @@
 # IMPORTS -------------------------------------------------------------------- #
 
+import textwrap
 import pandas as pd
 import numpy as np
 import requests
@@ -361,15 +362,16 @@ def create_rmarkdown(data, notebook_template):
         # Add logic to prefer parquet and fallback to csv
         # Determine the correct R loading command in Python
         if "parquet" in file_format:
-            load_code = f"""
-library(arrow)
-df <- read_parquet("{file_url}")
-            """
+            load_code = textwrap.dedent(f"""\
+            library(arrow)
+            df <- read_parquet("{file_url}")
+            """)
         else:
-            load_code = f"""
-library(readr)
-df <- read_csv("{file_url}")
-            """
+            load_code = textwrap.dedent(f"""\
+            library(readr)
+            df <- read_csv("{file_url}")
+            """)
+
 
         # Finalize the code block
         code_block += f"\n{load_code}"
