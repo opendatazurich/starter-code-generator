@@ -318,7 +318,7 @@ def create_python_notebooks(data, notebook_template):
 def create_rmarkdown(data, notebook_template):
     """Create R Markdown files with R starter code"""
     for idx in tqdm(data.index):
-        with open(f"{TEMPLATE_FOLDER}{notebook_template}") as file:
+        with open(f"{TEMPLATE_FOLDER}{notebook_template}", "r", encoding="utf-8") as file:
             rmd = file.read()
 
         # Populate template with metadata.
@@ -351,11 +351,23 @@ def create_rmarkdown(data, notebook_template):
         # add metadata from resource
         code_block = ""
         for col in RESOURCE_COLS_TO_KEEP:
-            prefix_col = PREFIX_RESOURCE_COLS+col
-            code_block += f"# {col}: \t\t{data.loc[idx,prefix_col]}\n"
-        # add url to load
-        url = data.loc[idx,PREFIX_RESOURCE_COLS+"url"]
-        code_block += f"\ndf <- read_delim('{url}')\n"
+            prefix_col = PREFIX_RESOURCE_COLS + col
+            code_block += f"# {col}: \t\t{data.loc[idx, prefix_col]}\n"
+
+        # Get file URL and format
+        file_url = data.loc[idx, PREFIX_RESOURCE_COLS + "url"]
+        file_format = data.loc[idx, PREFIX_RESOURCE_COLS + "format"].lower()  # Normalize format case
+
+        # Add logic to prefer parquet and fallback to csv
+        # Determine the correct R loading command in Python
+        if "parquet" in file_format:
+            load_code = f"""library(arrow) \ndf <- read_parquet("{file_url}")"""
+        else:
+            load_code = f"""library(readr) \ndf <- read_csv("{file_url}")"""
+
+
+        # Finalize the code block
+        code_block += f"\n{load_code}"
 
         rmd = rmd.replace("{{ DISTRIBUTIONS }}", code_block)
 
