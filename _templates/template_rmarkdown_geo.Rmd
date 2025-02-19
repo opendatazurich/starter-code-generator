@@ -25,6 +25,7 @@ Auto generated R starter code for data set {{ DATASET_IDENTIFIER }}.
 
 library(tidyverse)
 library(skimr)
+library(sf)
 
 ```
 
@@ -35,7 +36,39 @@ library(skimr)
 
 ```{r}
 
-{{ DISTRIBUTIONS }}
+# Helper function to get available layers from WFS
+get_wfs_layers <- function(url) {
+  dataset_identifier <- sub(".*/(.*)\\?.*", "\\1", url)
+  url_geoportal <- paste0("https://www.ogd.stadt-zuerich.ch/wfs/geoportal/", dataset_identifier)
+  
+  cat("Getting available layers from:", url_geoportal, "\n")
+  
+  params <- list(service = "WFS", version = "1.1.0", request = "GetCapabilities")
+  
+  response <- httr::GET(url_geoportal, query = params)
+  content <- httr::content(response, as = "text", encoding = "UTF-8")
+  
+  layers <- xml2::read_xml(content) %>%
+    xml2::xml_find_all(".//wfs:FeatureType/wfs:Name", xml2::xml_ns(content)) %>%
+    xml2::xml_text()
+  
+  cat("Available layers:", paste(layers, collapse = ", "), "\n")
+  
+  return(layers)
+}
+
+# Fetch available layers
+layers <- get_wfs_layers("{{ DISTRIBUTIONS }}")
+
+# Set first layer as default
+typename <- layers[1]
+cat("Chosen typename:", typename, "\n")
+
+# Construct WFS request URL
+wfs_url <- paste0("{{ DISTRIBUTIONS }}&service=WFS&version=1.1.0&request=GetFeature&typename=", typename, "&outputFormat=application/json")
+
+# Load GeoJSON data
+df <- st_read(wfs_url)
 
 ```
 
@@ -50,8 +83,22 @@ skim(df)
 head(df)
 tail(df)
 
+# Drop empty columns
+df <- df %>% select(where(~!all(is.na(.))))
+
+# Print dataset info
+cat(sprintf("The dataset has %d rows (observations) and %d columns (variables).\n", nrow(df), ncol(df)))
+cat(sprintf("There seem to be %d exact duplicates in the data.\n", sum(duplicated(df))))
+
+# Memory usage
+tibble::glimpse(df)
 ```
 
+# Plot data
+
+```{r}
+plot(df$geometry)
+```
 # Continue your code here...
 
 ```{r}
