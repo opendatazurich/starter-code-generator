@@ -359,12 +359,10 @@ def create_rmarkdown(data, notebook_template):
         file_format = data.loc[idx, PREFIX_RESOURCE_COLS + "format"].lower()  # Normalize format case
 
         # Add logic to prefer parquet and fallback to csv
-        # Determine the correct R loading command in Python
         if "parquet" in file_format:
             load_code = f"""library(arrow) \ndf <- read_parquet("{file_url}")"""
         else:
             load_code = f"""library(readr) \ndf <- read_csv("{file_url}")"""
-
 
         # Finalize the code block
         code_block += f"\n{load_code}"
