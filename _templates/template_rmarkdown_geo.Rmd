@@ -22,11 +22,11 @@ Auto generated R starter code for data set {{ DATASET_IDENTIFIER }}.
 # Load packages
 
 ```{r}
-
-library(tidyverse)
-library(skimr)
+library(httr2)
 library(sf)
-
+library(skimr)
+library(tidyverse)
+library(xml2)
 ```
 
 # Load data
@@ -34,115 +34,54 @@ library(sf)
 -   The dataset has {{ DISTRIBUTION_COUNT }} distribution(s) in CSV format.
 -   All available CSV distributions are listed below and can be read into a tibble.
 
+helper function to create the url based on the geoportal
+```{r}
+get_geoportal_url <- function(url) {
+  dataset_identifier <- sub(".*/(.*)\\?.*", "\\1", url)
+  paste0("https://www.ogd.stadt-zuerich.ch/wfs/geoportal/", dataset_identifier)
+}
+```
+
+
 der folgende Chunk funktioniert nicht
 ```{r}
-
 # Helper function to get available layers from WFS
 get_wfs_layers <- function(url) {
-  dataset_identifier <- sub(".*/(.*)\\?.*", "\\1", url)
-  url_geoportal <- paste0("https://www.ogd.stadt-zuerich.ch/wfs/geoportal/", dataset_identifier)
   
-  example_dataset_identifier <- "_GDP__Inventar_der_schuetzenswerten_Gaerten_und_Anlagen_von_kommunaler_Bedeutung_der_Stadt_Zuerich"
-  
-  url_geoportal <- paste0("https://www.ogd.stadt-zuerich.ch/wfs/geoportal/", example_dataset_identifier)
+  url_geoportal <- get_geoportal_url(url)
   
   cat("Getting available layers from:", url_geoportal, "\n")
   
-  resp <- httr2::request(url_geoportal) |> 
-    httr2::req_headers(service = "WFS", version = "1.1.0", request = "GetCapabilities") |> 
-    httr2::req_perform()
+  # read xml from geoportal
+  resp <- request(url_geoportal) |> 
+    req_headers(service = "WFS", version = "1.1.0", request = "GetCapabilities") |> 
+    req_perform()
   
-  content_as_xml <- httr2::resp_body_xml(resp)
+  content_as_xml <- resp_body_xml(resp)
   
-  xml_namespace <- xml2::xml_ns(xml2::read_xml("http://www.opengis.net/wfs"))
+  # find available layers: find "Name" nodes with parent "Layer"
+  name_nodes <- content_as_xml |> xml_ns_strip() |> xml_find_all("//Name")
   
-  content_as_xml |> 
-    xml2::xml_find_all(".//wfs:FeatureType", xml_namespace)
+  # keep all nodes that have Name and it's parent's name is "Layer"
+  # and directly extract the name to get a list of typenames
+  typename_nodes <- purrr::keep(name_nodes,
+                                \(x) xml_name(xml_parent(x)) == "Layer")
   
-  
-  params <- list(service = "WFS", version = "1.1.0", request = "GetCapabilities")
-  
-  response <- httr::GET(url_geoportal, query = params)
-  content <- httr::content(response, as = "text", encoding = "UTF-8")
-  
-  layers <- xml2::read_xml(content) %>%
-    xml2::xml_find_all(".//wfs:FeatureType/wfs:Name", xml2::xml_ns(content)) %>%
-    xml2::xml_text()
-  
-  cat("Available layers:", paste(layers, collapse = ", "), "\n")
-  
-  return(layers)
+  return(typename_nodes)
 }
 
 # Fetch available layers
 layers <- get_wfs_layers("{{ DISTRIBUTIONS }}")
 
 # Set first layer as default
-typename <- layers[1]
+typename <- xml_text(layers[[1]])
 cat("Chosen typename:", typename, "\n")
-
-
-
-# assuming we find the appropriate typename
-typename <- "gdp_objekte"
-resp2 <- httr2::request(url_geoportal) |> 
-  httr2::req_headers(service = "WFS", version = "1.1.0", request = "GetFeature",
-                     typename = typename, outputFormat = "application/json") |> 
-  httr2::req_perform()
-
-# Construct WFS request URL
-wfs_url <- paste0("{{ DISTRIBUTIONS }}&service=WFS&version=1.1.0&request=GetFeature&typename=", typename, "&outputFormat=application/json")
-
-# Load GeoJSON data
-df <- sf::st_read(wfs_url)
-
 ```
 
-funktioniert:
-- xml lesen
-- mit dem richtigen Knoten und einem neuen Request die eigentlichen Daten bekommen
-
-funktioniert nicht:
-- richtige Knoten aus dem XML finden
-
-xml lesen:
-```{r}
-library(httr2)
-library(xml2)
-
-example_dataset_identifier <- "_GDP__Inventar_der_schuetzenswerten_Gaerten_und_Anlagen_von_kommunaler_Bedeutung_der_Stadt_Zuerich"
-  
-url_geoportal <- paste0("https://www.ogd.stadt-zuerich.ch/wfs/geoportal/", example_dataset_identifier)
-
-cat("Getting available layers from:", url_geoportal, "\n")
-
-resp <- request(url_geoportal) |> 
-  req_headers(service = "WFS", version = "1.1.0", request = "GetCapabilities") |> 
-  req_perform()
-
-content_as_xml <- resp_body_xml(resp)
-```
-Typename aus xml extrahieren
-
-Versuch 1
-```{r}
-xml_namespace <- xml_ns(read_xml("http://www.opengis.net/wfs"))
-
-content_as_xml |> 
-  xml_find_all("//*[@FeatureType]", xml_namespace)
-```
-
-
-versuch mit geocat
-```{r}
-resp2 <- request("https://www.geocat.ch/geonetwork/srv/api/records/876cc251-9064-437a-94c6-5551318a1cd3") |> 
-  req_perform()
-```
-
-versuch mit ows4r
-```{r}
+if the approach above does not work, try using [ows4r](https://eblondel.github.io/ows4R/); however, this needs to be installed first
+```{r eval=FALSE}
+# install.packages("ows4R")
 library(ows4R)
-library(sf)
 
 # WFS-Client erstellen
 wfs_client <- WFSClient$new(url_geoportal, "1.1.0")
@@ -150,38 +89,29 @@ wfs_client <- WFSClient$new(url_geoportal, "1.1.0")
 # Verfügbare Feature-Typen anzeigen
 wfs_client$getFeatureTypes(pretty = TRUE)
 
-typename <- 
-  wfs_client$getFeatureTypes(pretty = TRUE) |> 
+typenames <- wfs_client$getFeatureTypes(pretty = TRUE) |> 
   dplyr::pull(name)
-
 ```
-das geht :-) aber schon ziemlich grosses Paket zum Installieren
 
-allenfalls weitere option: geometa
+then actually read the data
 ```{r}
-?geometa::readISO()
+read_geodata <- function(url, typename) {
+  url_geoportal <- get_geoportal_url(url)
+  
+  request <- request(url_geoportal) |>
+    req_url_query(
+      service = "WFS",
+      version = "1.1.0",
+      outputFormat = "GeoJSON",
+      request = "GetFeature",
+      typename = typename
+    )
+  
+  st_read(request$url)
+}
+
+df <- read_geodata("{{ DISTRIBUTIONS }}", typename)
 ```
-
-
-Daten lesen, wenn typename bekannt: 
-```{r}
-library(httr2)
-library(sf)
-
-wfs_url <- "https://www.ogd.stadt-zuerich.ch/wfs/geoportal/Brunnen"
-
-request <- request(wfs_url) |>
-  req_url_query(
-    service = "WFS",
-    version = "1.1.0",
-    outputFormat = "GeoJSON",
-    request = "GetFeature",
-    typename = "wvz_brunnen"
-  )
-
-df <- st_read(request$url)
-```
-
 
 # Analyze data
 
