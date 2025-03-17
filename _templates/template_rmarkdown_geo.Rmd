@@ -10,8 +10,7 @@ output: html_document
 
 {{ SSZ_COMMENTS }}
 
-{{ DATASHOP_LINK_PROVIDER }}<br>
-{{ DATASHOP_LINK_ORGANIZATION }}
+{{ DATASHOP_LINK_PROVIDER }}
 
 Auto generated R starter code for data set {{ DATASET_IDENTIFIER }}.
 
@@ -30,9 +29,9 @@ library(xml2)
 ```
 
 # Load data
-
--   The dataset has {{ DISTRIBUTION_COUNT }} distribution(s) in CSV format.
--   All available CSV distributions are listed below and can be read into a tibble.
+```{r}
+{{ DISTRIBUTIONS }}
+```
 
 helper function to create the url based on the geoportal
 ```{r}
@@ -42,8 +41,6 @@ get_geoportal_url <- function(url) {
 }
 ```
 
-
-der folgende Chunk funktioniert nicht
 ```{r}
 # Helper function to get available layers from WFS
 get_wfs_layers <- function(url) {
@@ -71,7 +68,7 @@ get_wfs_layers <- function(url) {
 }
 
 # Fetch available layers
-layers <- get_wfs_layers("{{ DISTRIBUTIONS }}")
+layers <- get_wfs_layers("{{ FILE_URL }}")
 
 # Set first layer as default
 typename <- xml_text(layers[[1]])
@@ -110,7 +107,7 @@ read_geodata <- function(url, typename) {
   st_read(request$url)
 }
 
-df <- read_geodata("{{ DISTRIBUTIONS }}", typename)
+df <- read_geodata("{{ FILE_URL }}", typename)
 ```
 
 # Analyze data
