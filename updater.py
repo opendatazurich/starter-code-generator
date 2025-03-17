@@ -353,22 +353,11 @@ def create_rmarkdown(data, notebook_template):
         for col in RESOURCE_COLS_TO_KEEP:
             prefix_col = PREFIX_RESOURCE_COLS + col
             code_block += f"# {col}: \t\t{data.loc[idx, prefix_col]}\n"
+        rmd = rmd.replace("{{ DISTRIBUTIONS }}", code_block)
 
         # Get file URL and format
         file_url = data.loc[idx, PREFIX_RESOURCE_COLS + "url"]
-        file_format = data.loc[idx, PREFIX_RESOURCE_COLS + "format"].lower()  # Normalize format case
-
-        # Add logic to prefer parquet and fallback to csv
-        if "parquet" in file_format:
-            load_code = f"""library(arrow) \ndf <- read_parquet("{file_url}")"""
-        else:
-            load_code = f"""library(readr) \ndf <- read_csv("{file_url}")"""
-
-        # Finalize the code block
-        code_block += f"\n{load_code}"
-
         rmd = rmd.replace("{{ FILE_URL }}", file_url)
-        rmd = rmd.replace("{{ DISTRIBUTIONS }}", code_block)
 
         # Save to disk.
         with open(

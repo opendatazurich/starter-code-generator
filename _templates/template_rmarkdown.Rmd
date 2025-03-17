@@ -35,6 +35,16 @@ library(skimr)
 
 ```
 
+```{r}
+url <- {{ FILE_URL }}
+if str_detect(url, ".csv") {
+    df <- readr::read_csv(url)
+} else if str_detect(url, ".parquet") {
+    df <- arrow::read_parquet(url)
+} else {
+    print("File format not recognised!")
+}
+```
 # Analyze data
 
 ```{r}
