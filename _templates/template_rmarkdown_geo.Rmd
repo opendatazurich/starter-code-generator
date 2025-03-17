@@ -119,7 +119,8 @@ glimpse(df)
 ```
 
 ```{r}
-skim(df)
+# look at distributions etc. without looking at geographical data (skim cannot deal with geometries)
+skim(st_drop_geometry(df))
 ```
 
 # Plot data
