@@ -345,7 +345,8 @@ def create_rmarkdown(data, notebook_template):
         rmd = rmd.replace("{{ CONTACT }}", data.loc[idx, "maintainer_email"])
         
         url = f'[Direct link by **{PROVIDER}** for dataset]({BASELINK_DATAPORTAL}{data.loc[idx, "name"]})'
-        rmd = rmd.replace("{{ DATASHOP_LINK_PROVIDER  }}", url)
+        print(url)
+        rmd = rmd.replace("{{ DATASHOP_LINK_PROVIDER }}", url)
         
         # add metadata from resource
         code_block = ""
