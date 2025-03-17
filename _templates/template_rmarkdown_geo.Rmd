@@ -30,7 +30,7 @@ library(xml2)
 
 # Load data
 
-helper function to create the url based on the geoportal
+Helper function to create the url based on the geoportal, as the files are not directly available via fixed link like csvs.
 ```{r}
 get_geoportal_url <- function(url) {
   dataset_identifier <- sub(".*/(.*)\\?.*", "\\1", url)
@@ -87,7 +87,7 @@ typenames <- wfs_client$getFeatureTypes(pretty = TRUE) |>
   dplyr::pull(name)
 ```
 
-then actually read the data
+read the data
 ```{r}
 read_geodata <- function(url, typename) {
   url_geoportal <- get_geoportal_url(url)
@@ -109,31 +109,33 @@ df <- read_geodata("{{ FILE_URL }}", typename)
 
 # Analyze data
 
+look at the data
 ```{r}
-
-glimpse(df)
-str(df)
-skim(df)
-
 head(df)
-tail(df)
+```
 
-# Drop empty columns
-df <- df %>% select(where(~!all(is.na(.))))
+```{r}
+glimpse(df)
+```
 
-# Print dataset info
-cat(sprintf("The dataset has %d rows (observations) and %d columns (variables).\n", nrow(df), ncol(df)))
-cat(sprintf("There seem to be %d exact duplicates in the data.\n", sum(duplicated(df))))
-
-# Memory usage
-tibble::glimpse(df)
+```{r}
+skim(df)
 ```
 
 # Plot data
 
+base R plot
 ```{r}
 plot(df$geometry)
 ```
+
+ggplot2 plot
+```{r}
+df |>
+  ggplot() +
+  geom_sf()
+```
+
 # Continue your code here...
 
 ```{r}
