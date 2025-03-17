@@ -29,9 +29,6 @@ library(xml2)
 ```
 
 # Load data
-```{r}
-{{ DISTRIBUTIONS }}
-```
 
 helper function to create the url based on the geoportal
 ```{r}

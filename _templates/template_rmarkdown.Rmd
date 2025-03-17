@@ -30,13 +30,7 @@ library(skimr)
 # Load data
 
 ```{r}
-
-{{ DISTRIBUTIONS }}
-
-```
-
-```{r}
-url <- {{ FILE_URL }}
+url <- "{{ FILE_URL }}"
 if str_detect(url, ".csv") {
     df <- readr::read_csv(url)
 } else if str_detect(url, ".parquet") {

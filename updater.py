@@ -347,13 +347,6 @@ def create_rmarkdown(data, notebook_template):
         url = f'[Direct link by **{PROVIDER}** for dataset]({BASELINK_DATAPORTAL}{data.loc[idx, "name"]})'
         print(url)
         rmd = rmd.replace("{{ DATASHOP_LINK_PROVIDER }}", url)
-        
-        # add metadata from resource
-        code_block = ""
-        for col in RESOURCE_COLS_TO_KEEP:
-            prefix_col = PREFIX_RESOURCE_COLS + col
-            code_block += f"# {col}: \t\t{data.loc[idx, prefix_col]}\n"
-        rmd = rmd.replace("{{ DISTRIBUTIONS }}", code_block)
 
         # Get file URL and format
         file_url = data.loc[idx, PREFIX_RESOURCE_COLS + "url"]
