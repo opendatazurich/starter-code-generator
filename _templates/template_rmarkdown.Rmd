@@ -25,7 +25,7 @@ library(skimr)
 library(tidyverse)
 ```
 
-# Load data
+# Load the data
 
 ```{r}
 url <- "{{ FILE_URL }}"
@@ -37,7 +37,8 @@ if (str_detect(url, ".csv")) {
     print("File format not recognised!")
 }
 ```
-# Analyze data
+
+# Analyze the data
 
 look at the data
 ```{r}
