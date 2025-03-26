@@ -343,33 +343,13 @@ def create_rmarkdown(data, notebook_template):
 
         rmd = rmd.replace("{{ DATASET_METADATA }}", data.loc[idx, "metadata"])
         rmd = rmd.replace("{{ CONTACT }}", data.loc[idx, "maintainer_email"])
-        # rmd = rmd.replace("{{ DISTRIBUTION_COUNT }}", str(len(data.loc[idx, "distributions"])))
-
+        
         url = f'[Direct link by **{PROVIDER}** for dataset]({BASELINK_DATAPORTAL}{data.loc[idx, "name"]})'
         rmd = rmd.replace("{{ DATASHOP_LINK_PROVIDER }}", url)
 
-        # add metadata from resource
-        code_block = ""
-        for col in RESOURCE_COLS_TO_KEEP:
-            prefix_col = PREFIX_RESOURCE_COLS + col
-            code_block += f"# {col}: \t\t{data.loc[idx, prefix_col]}\n"
-
         # Get file URL and format
         file_url = data.loc[idx, PREFIX_RESOURCE_COLS + "url"]
-        file_format = data.loc[idx, PREFIX_RESOURCE_COLS + "format"].lower()  # Normalize format case
-
-        # Add logic to prefer parquet and fallback to csv
-        # Determine the correct R loading command in Python
-        if "parquet" in file_format:
-            load_code = f"""library(arrow) \ndf <- read_parquet("{file_url}")"""
-        else:
-            load_code = f"""library(readr) \ndf <- read_csv("{file_url}")"""
-
-
-        # Finalize the code block
-        code_block += f"\n{load_code}"
-
-        rmd = rmd.replace("{{ DISTRIBUTIONS }}", code_block)
+        rmd = rmd.replace("{{ FILE_URL }}", file_url)
 
         # Save to disk.
         with open(
