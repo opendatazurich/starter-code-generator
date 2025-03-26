@@ -59,13 +59,10 @@ SORT_TABLE_BY = f"title"
 # Select keys in metadata for dataset and distributions.
 KEYS_DATASET = [
     "publisher",
-    #f"organization.display_name.{LANGUAGE}",
-    #"organization.url",
     "maintainer",
     "maintainer_email",
     "keywords",
     "tags",
-    #"issued",
     "metadata_created",
     "metadata_modified",
 ]
@@ -242,7 +239,7 @@ def prepare_data_for_codebooks(data):
     data.sort_values(f"{SORT_TABLE_BY}", inplace=True)
     data.reset_index(drop=True, inplace=True)
 
-    return data#[REDUCED_FEATURESET]
+    return data
 
 
 def create_python_notebooks(data, notebook_template):
@@ -272,12 +269,9 @@ def create_python_notebooks(data, notebook_template):
         py_nb = py_nb.replace(
             "{{ DATASET_METADATA }}", re.sub('"', "'", data.loc[idx, "metadata"])
         )
-        # py_nb = py_nb.replace("{{ DISTRIBUTION_COUNT }}", str(len(data.loc[idx, "distributions"]))        )
-
+        
         url = f'[Direct link by {PROVIDER} for dataset]({BASELINK_DATAPORTAL}{data.loc[idx, "name"]})\n\n{data.loc[idx,PREFIX_RESOURCE_COLS+"url"]}'
         py_nb = py_nb.replace("{{ DATASHOP_LINK_PROVIDER }}", url)
-
-
 
         py_nb = py_nb.replace("{{ CONTACT }}", data.loc[idx, "maintainer_email"])
 
