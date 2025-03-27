@@ -275,31 +275,10 @@ def create_python_notebooks(data, notebook_template):
 
         py_nb = py_nb.replace("{{ CONTACT }}", data.loc[idx, "maintainer_email"])
 
+        file_url = data.loc[idx,PREFIX_RESOURCE_COLS+"url"]
+        py_nb = py_nb.replace("{{ FILE_URL }}", file_url)
+
         py_nb = json.loads(py_nb, strict=False)
-
-        # Find code cell for dataset imports.
-        for id_cell, cell in enumerate(py_nb["cells"]):
-            if cell["id"] == "0":
-                dist_cell_idx = id_cell
-                break
-
-        
-        # add metadata from resource
-        code_block = ""
-        for col in RESOURCE_COLS_TO_KEEP:
-            prefix_col = PREFIX_RESOURCE_COLS+col
-            # spacer = 30 - len(col)+ 5
-            code_block += f"# {col}: {data.loc[idx,prefix_col]}\n"
-        # add url to load
-        url = data.loc[idx,PREFIX_RESOURCE_COLS+"url"]
-        if notebook_template == TEMPLATE_PYTHON_GEO:
-            # naming convention for geopandas dataframe is gdf
-            df_prefix = 'g'
-        else:
-            df_prefix = ''
-        code_block += f"\n{df_prefix}df = get_dataset('{url}')\n"
-        py_nb["cells"][dist_cell_idx]["source"] = code_block
-
         # Save to disk.
         with open(
             f'{TEMP_PREFIX}{REPO_PYTHON_OUTPUT}{data.loc[idx, "name"]}_{data.loc[idx, PREFIX_RESOURCE_COLS+"id"]}.ipynb',
