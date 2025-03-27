@@ -59,13 +59,10 @@ SORT_TABLE_BY = f"title"
 # Select keys in metadata for dataset and distributions.
 KEYS_DATASET = [
     "publisher",
-    #f"organization.display_name.{LANGUAGE}",
-    #"organization.url",
     "maintainer",
     "maintainer_email",
     "keywords",
     "tags",
-    #"issued",
     "metadata_created",
     "metadata_modified",
 ]
@@ -242,7 +239,7 @@ def prepare_data_for_codebooks(data):
     data.sort_values(f"{SORT_TABLE_BY}", inplace=True)
     data.reset_index(drop=True, inplace=True)
 
-    return data#[REDUCED_FEATURESET]
+    return data
 
 
 def create_python_notebooks(data, notebook_template):
@@ -272,40 +269,16 @@ def create_python_notebooks(data, notebook_template):
         py_nb = py_nb.replace(
             "{{ DATASET_METADATA }}", re.sub('"', "'", data.loc[idx, "metadata"])
         )
-        # py_nb = py_nb.replace("{{ DISTRIBUTION_COUNT }}", str(len(data.loc[idx, "distributions"]))        )
-
+        
         url = f'[Direct link by {PROVIDER} for dataset]({BASELINK_DATAPORTAL}{data.loc[idx, "name"]})\n\n{data.loc[idx,PREFIX_RESOURCE_COLS+"url"]}'
         py_nb = py_nb.replace("{{ DATASHOP_LINK_PROVIDER }}", url)
 
-
-
         py_nb = py_nb.replace("{{ CONTACT }}", data.loc[idx, "maintainer_email"])
 
+        file_url = data.loc[idx,PREFIX_RESOURCE_COLS+"url"]
+        py_nb = py_nb.replace("{{ FILE_URL }}", file_url)
+
         py_nb = json.loads(py_nb, strict=False)
-
-        # Find code cell for dataset imports.
-        for id_cell, cell in enumerate(py_nb["cells"]):
-            if cell["id"] == "0":
-                dist_cell_idx = id_cell
-                break
-
-        
-        # add metadata from resource
-        code_block = ""
-        for col in RESOURCE_COLS_TO_KEEP:
-            prefix_col = PREFIX_RESOURCE_COLS+col
-            # spacer = 30 - len(col)+ 5
-            code_block += f"# {col}: {data.loc[idx,prefix_col]}\n"
-        # add url to load
-        url = data.loc[idx,PREFIX_RESOURCE_COLS+"url"]
-        if notebook_template == TEMPLATE_PYTHON_GEO:
-            # naming convention for geopandas dataframe is gdf
-            df_prefix = 'g'
-        else:
-            df_prefix = ''
-        code_block += f"\n{df_prefix}df = get_dataset('{url}')\n"
-        py_nb["cells"][dist_cell_idx]["source"] = code_block
-
         # Save to disk.
         with open(
             f'{TEMP_PREFIX}{REPO_PYTHON_OUTPUT}{data.loc[idx, "name"]}_{data.loc[idx, PREFIX_RESOURCE_COLS+"id"]}.ipynb',
