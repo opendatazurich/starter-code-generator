@@ -335,7 +335,7 @@ def create_overview(data, header):
     md_doc = []
     md_doc.append(header)
     md_doc.append(
-        f"| Title (abbreviated to {TITLE_MAX_CHARS} chars) | Python Colab | R-Studio Binder | Python GitHub | R GitHub | File |\n"
+        f"| Title (abbreviated to {TITLE_MAX_CHARS} chars) | Python Colab | Python Binder | Python GitHub | R GitHub | File |\n"
     )
     md_doc.append("| :-- | :-- | :-- | :-- | :-- | :-- |\n")
 
@@ -362,12 +362,11 @@ def create_overview(data, header):
         py_gh_link = f"[Python GitHub]({baselink_py_gh}{filename}.ipynb)"
         py_colab_link = f"[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)]({baselink_py_colab}{filename}.ipynb)"
         py_binder_link = f"[![Jupyter Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/{GITHUB_ACCOUNT}/{REPO_NAME}/{REPO_BRANCH}?filepath={REPO_PYTHON_OUTPUT}{filename}.ipynb)"
-        r_binder_link = f"[![R Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/{GITHUB_ACCOUNT}/{REPO_NAME}/{REPO_BRANCH}?filepath={REPO_RMARKDOWN_OUTPUT}{filename}.Rmd)"
 
         # py_kaggle_link = f'[![Kaggle](https://kaggle.com/static/images/open-in-kaggle.svg)]({baselink_py_kaggle}{filename}.ipnyb)'
 
         md_doc.append(
-            f"| [{title_clean}]({ds_link}) | {py_colab_link} | {r_binder_link} | {py_gh_link} | {r_gh_link} | {resource_format} |\n"
+            f"| [{title_clean}]({ds_link}) | {py_colab_link} | {py_binder_link} | {py_gh_link} | {r_gh_link} | {resource_format} |\n"
         )
 
     md_doc = "".join(md_doc)
