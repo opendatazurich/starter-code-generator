@@ -7,7 +7,6 @@ import json
 import re
 from datetime import datetime
 import time
-from tqdm import tqdm
 
 
 # CONSTANTS ------------------------------------------------------------------ #
@@ -45,9 +44,6 @@ TODAY_DATETIME = datetime.today().strftime("%Y-%m-%d %H:%M:%S")
 
 # Set max length of dataset title in markdown table.
 TITLE_MAX_CHARS = 200
-
-# Sort markdown table by this feature.
-SORT_TABLE_BY = f"title"
 
 # Select keys in metadata for dataset and distributions.
 KEYS_DATASET = [
@@ -93,6 +89,7 @@ def get_full_package_list(limit=500, sleep=2):
         time.sleep(sleep)
     data = pd.concat(frames)
     data.reset_index(drop=True, inplace=True)
+    print("Number of datasets", data.shape[0])
     return data
 
 def dataset_to_resource(all_packages, prefix_resource_cols=PREFIX_RESOURCE_COLS, resource_cols_to_keep=RESOURCE_COLS_TO_KEEP):
@@ -103,6 +100,7 @@ def dataset_to_resource(all_packages, prefix_resource_cols=PREFIX_RESOURCE_COLS,
     Json fields in resource get a prefix: prefix_resource_cols
     This function explodes the df, so that each row in the output represents one resource.
     """
+    print("Explode dataset to resource level")
     # explode every resource in one row
     all_packages_exploded = all_packages.explode('resources')
     # json to columns and only keep the selected
@@ -114,7 +112,7 @@ def dataset_to_resource(all_packages, prefix_resource_cols=PREFIX_RESOURCE_COLS,
 
     # reset index, because later functions will need unique indices
     merged = merged.reset_index(drop=True)
-
+    print("Number of resources", merged.shape[0])
     return merged
 
 
@@ -125,7 +123,7 @@ def filter_resources(df, desired_formats=['table_data','geo_data']):
     returns a dict with desired_formats as keys and filtered dataframes as values
     
     """
-
+    print("Filter data by:", desired_formats)
     # set col value for table data
     if "table_data" in desired_formats:
         table_formats = ['csv', 'parquet']
@@ -179,6 +177,8 @@ def clean_features(data):
 def prepare_data_for_codebooks(data):
     """Prepare metadata from catalogue in order to create the code files"""
     # Add new features to save prepared data.
+    print("Preparation for codebook files")
+
     data["metadata"] = None
     data["contact"] = ""
     data["distributions"] = None
@@ -192,7 +192,7 @@ def prepare_data_for_codebooks(data):
 
     data['description'] = data['notes']
     # Sort values for table.
-    data.sort_values(f"{SORT_TABLE_BY}", inplace=True)
+    data.sort_values(by=['title', 'name', PREFIX_RESOURCE_COLS+"name"], inplace=True)
     data.reset_index(drop=True, inplace=True)
 
     return data
@@ -201,7 +201,7 @@ def prepare_data_for_codebooks(data):
 def create_python_notebooks(data, notebook_template):
     """Create Jupyter Notebooks with Python starter code"""
     print("Creating", data.shape[0], "Python Notebook files with template:", notebook_template)
-    for idx in tqdm(data.index):
+    for idx in data.index:
         with open(f"{TEMPLATE_FOLDER}{notebook_template}") as file:
             py_nb = file.read()
 
@@ -247,7 +247,7 @@ def create_python_notebooks(data, notebook_template):
 def create_rmarkdown(data, notebook_template):
     """Create R Markdown files with R starter code"""
     print("Creating", data.shape[0], "R Markdown files with template:", notebook_template)
-    for idx in tqdm(data.index):
+    for idx in data.index:
         with open(f"{TEMPLATE_FOLDER}{notebook_template}", "r", encoding="utf-8") as file:
             rmd = file.read()
 
@@ -335,7 +335,7 @@ def create_overview(data, header):
     md_doc = []
     md_doc.append(header)
     md_doc.append(
-        f"| Title (abbreviated to {TITLE_MAX_CHARS} chars) | Fileinfo | Python Colab | Python Binder | Python GitHub | R GitHub |\n"
+        f"| Title (abbreviated to {TITLE_MAX_CHARS} chars) | Python Colab | R-Studio Binder | Python GitHub | R GitHub | File |\n"
     )
     md_doc.append("| :-- | :-- | :-- | :-- | :-- | :-- |\n")
 
@@ -362,11 +362,12 @@ def create_overview(data, header):
         py_gh_link = f"[Python GitHub]({baselink_py_gh}{filename}.ipynb)"
         py_colab_link = f"[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)]({baselink_py_colab}{filename}.ipynb)"
         py_binder_link = f"[![Jupyter Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/{GITHUB_ACCOUNT}/{REPO_NAME}/{REPO_BRANCH}?filepath={REPO_PYTHON_OUTPUT}{filename}.ipynb)"
+        r_binder_link = f"[![R Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/{GITHUB_ACCOUNT}/{REPO_NAME}/{REPO_BRANCH}?filepath={REPO_RMARKDOWN_OUTPUT}{filename}.Rmd)"
 
         # py_kaggle_link = f'[![Kaggle](https://kaggle.com/static/images/open-in-kaggle.svg)]({baselink_py_kaggle}{filename}.ipnyb)'
 
         md_doc.append(
-            f"| [{title_clean}]({ds_link}) | {resource_format} | {py_colab_link} | {py_binder_link} | {py_gh_link} | {r_gh_link} |\n"
+            f"| [{title_clean}]({ds_link}) | {py_colab_link} | {r_binder_link} | {py_gh_link} | {r_gh_link} | {resource_format} |\n"
         )
 
     md_doc = "".join(md_doc)
@@ -383,9 +384,10 @@ all_packages = get_full_package_list()
 df = dataset_to_resource(all_packages)
 df = clean_features(df)
 df = filter_resources(df)
+print("Number of resources", df.shape[0])
 df = prepare_data_for_codebooks(df)
 
-print("Number of resources", df.shape[0])
+
 # limit output
 # df = df.head(20)
 
@@ -401,9 +403,9 @@ df_geodata = df[df['format_filter']=='geo_data']
 create_python_notebooks(df_geodata, TEMPLATE_PYTHON_GEO)
 create_rmarkdown(df_geodata, TEMPLATE_RMARKDOWN_GEO)
 
-
 print(df)
 
+print("Create overview an readme files")
 header = get_header(dataset_count=len(df))
 create_readme(dataset_count=len(df))
 create_overview(df, header)

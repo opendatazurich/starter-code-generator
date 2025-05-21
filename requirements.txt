@@ -1,7 +1,6 @@
 pandas
 numpy
 requests
-tqdm
 beautifulsoup4
 ipykernel
 jupyter
