@@ -7,8 +7,8 @@ dependencies:
   - missingno
   - pandas
   - pyarrow
-  - tqdm
   - r-base
   - r-tidyverse
   - r-arrow
   - r-skimr
+  - r-sf
