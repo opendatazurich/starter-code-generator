@@ -163,7 +163,7 @@ def clean_features(data):
     """Clean various features"""
     # Reduce publisher data to name.
     # In rare cases the publisher is not provided.
-    data['publisher'] = data['author'] #.apply(lambda x: json.loads(x)["name"] if "name" in json.loads(x) else "Publisher not provided")
+    data['publisher'] = data['author']
 
     # Reduce tags to tag names.
     data.tags = data.tags.apply(lambda x: [tag["name"] for tag in x])
@@ -330,7 +330,6 @@ def create_overview(data, header):
     baselink_r_gh = f"https://github.com/{GITHUB_ACCOUNT}/{REPO_NAME}/blob/{REPO_BRANCH}/{REPO_RMARKDOWN_OUTPUT}/"
     baselink_py_gh = f"https://github.com/{GITHUB_ACCOUNT}/{REPO_NAME}/blob/{REPO_BRANCH}/{REPO_PYTHON_OUTPUT}/"
     baselink_py_colab = f"https://githubtocolab.com/{GITHUB_ACCOUNT}/{REPO_NAME}/blob/{REPO_BRANCH}/{REPO_PYTHON_OUTPUT}/"
-    # baselink_py_kaggle = f"https://kaggle.com/kernels/welcome?src={baselink_py_gh}"
 
     md_doc = []
     md_doc.append(header)
@@ -363,7 +362,6 @@ def create_overview(data, header):
         py_colab_link = f"[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)]({baselink_py_colab}{filename}.ipynb)"
         py_binder_link = f"[![Jupyter Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/{GITHUB_ACCOUNT}/{REPO_NAME}/{REPO_BRANCH}?filepath={REPO_PYTHON_OUTPUT}{filename}.ipynb)"
 
-        # py_kaggle_link = f'[![Kaggle](https://kaggle.com/static/images/open-in-kaggle.svg)]({baselink_py_kaggle}{filename}.ipnyb)'
 
         md_doc.append(
             f"| [{title_clean}]({ds_link}) | {py_colab_link} | {py_binder_link} | {py_gh_link} | {r_gh_link} | {resource_format} |\n"
@@ -412,8 +410,6 @@ print("Number of resources", df.shape[0])
 df = prepare_data_for_codebooks(df)
 
 
-# limit output
-# df = df.head(20)
 
 # table data
 print("Make notebooks for table data")
