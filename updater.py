@@ -7,13 +7,6 @@ import json
 import re
 from datetime import datetime
 import time
-from tqdm import tqdm
-
-from bs4 import BeautifulSoup as bs4
-
-import warnings
-
-warnings.simplefilter(action="ignore", category=FutureWarning)
 
 
 # CONSTANTS ------------------------------------------------------------------ #
@@ -25,7 +18,6 @@ BASELINK_DATAPORTAL = "https://data.stadt-zuerich.ch/dataset/"
 CKAN_API_LINK = (
     "https://data.stadt-zuerich.ch/api/3/action/current_package_list_with_resources"
 )
-LANGUAGE = "de"
 
 # Set constants in regard to GitHub account and repo.
 GITHUB_ACCOUNT = "opendatazurich"
@@ -53,23 +45,16 @@ TODAY_DATETIME = datetime.today().strftime("%Y-%m-%d %H:%M:%S")
 # Set max length of dataset title in markdown table.
 TITLE_MAX_CHARS = 200
 
-# Sort markdown table by this feature.
-SORT_TABLE_BY = f"title"
-
 # Select keys in metadata for dataset and distributions.
 KEYS_DATASET = [
     "publisher",
-    #f"organization.display_name.{LANGUAGE}",
-    #"organization.url",
     "maintainer",
     "maintainer_email",
     "keywords",
     "tags",
-    #"issued",
     "metadata_created",
     "metadata_modified",
 ]
-KEYS_DISTRIBUTIONS = ["package_id", "description", "format", "resource_type", "name", "url"]
 
 
 PREFIX_RESOURCE_COLS = "resources_"
@@ -104,6 +89,7 @@ def get_full_package_list(limit=500, sleep=2):
         time.sleep(sleep)
     data = pd.concat(frames)
     data.reset_index(drop=True, inplace=True)
+    print("Number of datasets", data.shape[0])
     return data
 
 def dataset_to_resource(all_packages, prefix_resource_cols=PREFIX_RESOURCE_COLS, resource_cols_to_keep=RESOURCE_COLS_TO_KEEP):
@@ -114,6 +100,7 @@ def dataset_to_resource(all_packages, prefix_resource_cols=PREFIX_RESOURCE_COLS,
     Json fields in resource get a prefix: prefix_resource_cols
     This function explodes the df, so that each row in the output represents one resource.
     """
+    print("Explode dataset to resource level")
     # explode every resource in one row
     all_packages_exploded = all_packages.explode('resources')
     # json to columns and only keep the selected
@@ -125,15 +112,9 @@ def dataset_to_resource(all_packages, prefix_resource_cols=PREFIX_RESOURCE_COLS,
 
     # reset index, because later functions will need unique indices
     merged = merged.reset_index(drop=True)
-
+    print("Number of resources", merged.shape[0])
     return merged
 
-def filter_resources(df, desired_formats=['csv','parquet','wfs']):
-    """
-    Filter df with resources for desired_formats (e.g. csv). Formats should be lower case.
-    Be aware that the filtered column has to match the prefix defined in dataset_to_resource.
-    """
-    return df[df[PREFIX_RESOURCE_COLS+'format'].str.lower().isin(desired_formats)]
 
 def filter_resources(df, desired_formats=['table_data','geo_data']):
     """
@@ -142,22 +123,7 @@ def filter_resources(df, desired_formats=['table_data','geo_data']):
     returns a dict with desired_formats as keys and filtered dataframes as values
     
     """
-    out_dict = {}
-    if "table_data" in desired_formats:
-        # filter desired file formats
-        table_formats = ['csv', 'parquet']
-        table_data = df[df[PREFIX_RESOURCE_COLS+'format'].str.lower().isin(table_formats)]
-        # do not filter geo data csvs
-        table_data = table_data[~table_data['tags'].apply(lambda tag: 'geodaten' in tag)]
-        out_dict['table_data'] = table_data
-
-    if "geo_data" in desired_formats:
-        # filter desired file formats
-        geo_data = df[df[PREFIX_RESOURCE_COLS+'url'].str.contains('geojson')]
-        # only filter resources from the city of Zürich (not canton)
-        geo_data = geo_data[geo_data['tags'].apply(lambda tag: 'stzh' in tag)]
-        out_dict['geo_data'] = geo_data
-
+    print("Filter data by:", desired_formats)
     # set col value for table data
     if "table_data" in desired_formats:
         table_formats = ['csv', 'parquet']
@@ -181,21 +147,6 @@ def filter_resources(df, desired_formats=['table_data','geo_data']):
 
     return df[df['format_filter'].notna()]
 
-def has_csv_distribution(dists):
-    """Iterate over package resources and keep only CSV entries in list"""
-    csv_dists = [x for x in dists if x.get("format", "") == "CSV"]
-    if csv_dists != []:
-        return csv_dists
-    else:
-        return np.nan
-
-
-def filter_csv(data):
-    """Remove all datasets that have no CSV distribution"""
-    data.resources = data.resources.apply(has_csv_distribution)
-    data.dropna(subset=["resources"], inplace=True)
-    return data.reset_index(drop=True)
-
 
 def extract_keywords(x, sep=','):
     """
@@ -212,7 +163,7 @@ def clean_features(data):
     """Clean various features"""
     # Reduce publisher data to name.
     # In rare cases the publisher is not provided.
-    data['publisher'] = data['author'] #.apply(lambda x: json.loads(x)["name"] if "name" in json.loads(x) else "Publisher not provided")
+    data['publisher'] = data['author']
 
     # Reduce tags to tag names.
     data.tags = data.tags.apply(lambda x: [tag["name"] for tag in x])
@@ -226,29 +177,31 @@ def clean_features(data):
 def prepare_data_for_codebooks(data):
     """Prepare metadata from catalogue in order to create the code files"""
     # Add new features to save prepared data.
+    print("Preparation for codebook files")
+
     data["metadata"] = None
     data["contact"] = ""
     data["distributions"] = None
     data["distribution_links"] = None
 
     # Iterate over datasets and create additional data for markdown and code cells.
-    for idx in tqdm(data.index):
+    for idx in data.index:
         md = [f"- **{k.capitalize()}** `{data.loc[idx, k]}`\n" for k in KEYS_DATASET]
         data.loc[idx, "metadata"] = "".join(md)
 
 
     data['description'] = data['notes']
     # Sort values for table.
-    data.sort_values(f"{SORT_TABLE_BY}", inplace=True)
+    data.sort_values(by=['title', 'name', PREFIX_RESOURCE_COLS+"name"], inplace=True)
     data.reset_index(drop=True, inplace=True)
 
-    return data#[REDUCED_FEATURESET]
+    return data
 
 
 def create_python_notebooks(data, notebook_template):
     """Create Jupyter Notebooks with Python starter code"""
-    for idx in tqdm(data.index):
-        print(data.loc[idx, "name"])
+    print("Creating", data.shape[0], "Python Notebook files with template:", notebook_template)
+    for idx in data.index:
         with open(f"{TEMPLATE_FOLDER}{notebook_template}") as file:
             py_nb = file.read()
 
@@ -272,40 +225,16 @@ def create_python_notebooks(data, notebook_template):
         py_nb = py_nb.replace(
             "{{ DATASET_METADATA }}", re.sub('"', "'", data.loc[idx, "metadata"])
         )
-        # py_nb = py_nb.replace("{{ DISTRIBUTION_COUNT }}", str(len(data.loc[idx, "distributions"]))        )
-
+        
         url = f'[Direct link by {PROVIDER} for dataset]({BASELINK_DATAPORTAL}{data.loc[idx, "name"]})\n\n{data.loc[idx,PREFIX_RESOURCE_COLS+"url"]}'
         py_nb = py_nb.replace("{{ DATASHOP_LINK_PROVIDER }}", url)
 
-
-
         py_nb = py_nb.replace("{{ CONTACT }}", data.loc[idx, "maintainer_email"])
 
+        file_url = data.loc[idx,PREFIX_RESOURCE_COLS+"url"]
+        py_nb = py_nb.replace("{{ FILE_URL }}", file_url)
+
         py_nb = json.loads(py_nb, strict=False)
-
-        # Find code cell for dataset imports.
-        for id_cell, cell in enumerate(py_nb["cells"]):
-            if cell["id"] == "0":
-                dist_cell_idx = id_cell
-                break
-
-        
-        # add metadata from resource
-        code_block = ""
-        for col in RESOURCE_COLS_TO_KEEP:
-            prefix_col = PREFIX_RESOURCE_COLS+col
-            # spacer = 30 - len(col)+ 5
-            code_block += f"# {col}: {data.loc[idx,prefix_col]}\n"
-        # add url to load
-        url = data.loc[idx,PREFIX_RESOURCE_COLS+"url"]
-        if notebook_template == TEMPLATE_PYTHON_GEO:
-            # naming convention for geopandas dataframe is gdf
-            df_prefix = 'g'
-        else:
-            df_prefix = ''
-        code_block += f"\n{df_prefix}df = get_dataset('{url}')\n"
-        py_nb["cells"][dist_cell_idx]["source"] = code_block
-
         # Save to disk.
         with open(
             f'{TEMP_PREFIX}{REPO_PYTHON_OUTPUT}{data.loc[idx, "name"]}_{data.loc[idx, PREFIX_RESOURCE_COLS+"id"]}.ipynb',
@@ -317,7 +246,8 @@ def create_python_notebooks(data, notebook_template):
 
 def create_rmarkdown(data, notebook_template):
     """Create R Markdown files with R starter code"""
-    for idx in tqdm(data.index):
+    print("Creating", data.shape[0], "R Markdown files with template:", notebook_template)
+    for idx in data.index:
         with open(f"{TEMPLATE_FOLDER}{notebook_template}", "r", encoding="utf-8") as file:
             rmd = file.read()
 
@@ -400,16 +330,15 @@ def create_overview(data, header):
     baselink_r_gh = f"https://github.com/{GITHUB_ACCOUNT}/{REPO_NAME}/blob/{REPO_BRANCH}/{REPO_RMARKDOWN_OUTPUT}/"
     baselink_py_gh = f"https://github.com/{GITHUB_ACCOUNT}/{REPO_NAME}/blob/{REPO_BRANCH}/{REPO_PYTHON_OUTPUT}/"
     baselink_py_colab = f"https://githubtocolab.com/{GITHUB_ACCOUNT}/{REPO_NAME}/blob/{REPO_BRANCH}/{REPO_PYTHON_OUTPUT}/"
-    # baselink_py_kaggle = f"https://kaggle.com/kernels/welcome?src={baselink_py_gh}"
 
     md_doc = []
     md_doc.append(header)
     md_doc.append(
-        f"| Title (abbreviated to {TITLE_MAX_CHARS} chars) | Fileinfo | Python Colab | Python Binder | Python GitHub | R GitHub |\n"
+        f"| Title (abbreviated to {TITLE_MAX_CHARS} chars) | Python Colab | Python Binder | Python GitHub | R GitHub | File |\n"
     )
     md_doc.append("| :-- | :-- | :-- | :-- | :-- | :-- |\n")
 
-    for idx in tqdm(data.index):
+    for idx in data.index:
         # Remove square brackets from title, since these break markdown links.
         title_clean = (
             data.loc[idx, f"title"].replace("[", " ").replace("]", " ")
@@ -418,11 +347,11 @@ def create_overview(data, header):
             title_clean = title_clean[:TITLE_MAX_CHARS] + "…"
         
         # filename is empty when format is json
-        if isinstance(data.loc[idx, PREFIX_RESOURCE_COLS+"filename"], str):
-            resource_filename = data.loc[idx, PREFIX_RESOURCE_COLS+"filename"]
+        if isinstance(data.loc[idx, PREFIX_RESOURCE_COLS+"name"], str):
+            resource_filename = data.loc[idx, PREFIX_RESOURCE_COLS+"name"]
         else:
             resource_filename = 'No filename provided'
-        resource_format = f'{resource_filename} ({data.loc[idx, PREFIX_RESOURCE_COLS+"format"]})'
+        resource_format = f'{resource_filename}' # ({data.loc[idx, PREFIX_RESOURCE_COLS+"format"]})'
         
         ds_link = f'{BASELINK_DATAPORTAL}{data.loc[idx, "name"]}'
         filename = f'{data.loc[idx, "name"]}_{data.loc[idx, PREFIX_RESOURCE_COLS+"id"]}'#data.loc[idx, "id"]
@@ -433,10 +362,9 @@ def create_overview(data, header):
         py_colab_link = f"[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)]({baselink_py_colab}{filename}.ipynb)"
         py_binder_link = f"[![Jupyter Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/{GITHUB_ACCOUNT}/{REPO_NAME}/{REPO_BRANCH}?filepath={REPO_PYTHON_OUTPUT}{filename}.ipynb)"
 
-        # py_kaggle_link = f'[![Kaggle](https://kaggle.com/static/images/open-in-kaggle.svg)]({baselink_py_kaggle}{filename}.ipnyb)'
 
         md_doc.append(
-            f"| [{title_clean}]({ds_link}) | {resource_format} | {py_colab_link} | {py_binder_link} | {py_gh_link} | {r_gh_link} |\n"
+            f"| [{title_clean}]({ds_link}) | {py_colab_link} | {py_binder_link} | {py_gh_link} | {r_gh_link} | {resource_format} |\n"
         )
 
     md_doc = "".join(md_doc)
@@ -444,11 +372,13 @@ def create_overview(data, header):
     with open(f"{TEMP_PREFIX}index.md", "w", encoding="utf-8") as file:
         file.write(md_doc)
 
+
 def update_ckan_metadata(text, ckan_field='description' ,env='int'):
     """
     Use CKAN API to update a field in the resource metadata
     """
     pass
+
 
 def prepare_for_ckan(df):
     """
@@ -468,19 +398,18 @@ def prepare_for_ckan(df):
         print(url_string)
         #update_ckan_metadata(url_string)
 
+
 # CREATE CODE FILES ---------------------------------------------------------- #
 
 all_packages = get_full_package_list()
 
-# df = filter_csv(all_packages)
-
 df = dataset_to_resource(all_packages)
 df = clean_features(df)
 df = filter_resources(df)
+print("Number of resources", df.shape[0])
 df = prepare_data_for_codebooks(df)
 
-# limit output
-df = df.head(20)
+
 
 # table data
 print("Make notebooks for table data")
@@ -494,9 +423,9 @@ df_geodata = df[df['format_filter']=='geo_data']
 create_python_notebooks(df_geodata, TEMPLATE_PYTHON_GEO)
 create_rmarkdown(df_geodata, TEMPLATE_RMARKDOWN_GEO)
 
-
 print(df)
 
+print("Create overview an readme files")
 header = get_header(dataset_count=len(df))
 create_readme(dataset_count=len(df))
 create_overview(df, header)
