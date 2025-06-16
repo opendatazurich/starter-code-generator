@@ -68,6 +68,10 @@ RESOURCE_COLS_TO_KEEP = [
     'package_id',
 ]
 
+# renku constants
+RENKU_NAMESPACE = "cramakri"
+RENKU_PROJECT_SLUG = "opendata-zh"
+RENKU_SESSION_ID = "01JM9MW8RWS0FPEA9SGKWJDV64"
 
 # FUNCTIONS ------------------------------------------------------------------ #
 
@@ -330,11 +334,12 @@ def create_overview(data, header):
     baselink_r_gh = f"https://github.com/{GITHUB_ACCOUNT}/{REPO_NAME}/blob/{REPO_BRANCH}/{REPO_RMARKDOWN_OUTPUT}/"
     baselink_py_gh = f"https://github.com/{GITHUB_ACCOUNT}/{REPO_NAME}/blob/{REPO_BRANCH}/{REPO_PYTHON_OUTPUT}/"
     baselink_py_colab = f"https://githubtocolab.com/{GITHUB_ACCOUNT}/{REPO_NAME}/blob/{REPO_BRANCH}/{REPO_PYTHON_OUTPUT}/"
+    baselink_py_renku = f"https://renkulab.io/p/{RENKU_NAMESPACE}/{RENKU_PROJECT_SLUG}/sessions/{RENKU_SESSION_ID}/"
 
     md_doc = []
     md_doc.append(header)
     md_doc.append(
-        f"| Title (abbreviated to {TITLE_MAX_CHARS} chars) | Python Colab | Python Binder | Python GitHub | R GitHub | File |\n"
+        f"| Title (abbreviated to {TITLE_MAX_CHARS} chars) | Python Colab | Python Renku | Python GitHub | R GitHub | File |\n"
     )
     md_doc.append("| :-- | :-- | :-- | :-- | :-- | :-- |\n")
 
@@ -361,10 +366,10 @@ def create_overview(data, header):
         py_gh_link = f"[Python GitHub]({baselink_py_gh}{filename}.ipynb)"
         py_colab_link = f"[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)]({baselink_py_colab}{filename}.ipynb)"
         py_binder_link = f"[![Jupyter Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/{GITHUB_ACCOUNT}/{REPO_NAME}/{REPO_BRANCH}?filepath={REPO_PYTHON_OUTPUT}{filename}.ipynb)"
-
+        py_renku_link = f"[![launch - renku](https://renkulab.io/renku-badge.svg)]({baselink_py_renku}start?PACKAGE_ID={data.loc[idx, 'name']}&RESOURCE_ID={data.loc[idx, PREFIX_RESOURCE_COLS+'id']})"
 
         md_doc.append(
-            f"| [{title_clean}]({ds_link}) | {py_colab_link} | {py_binder_link} | {py_gh_link} | {r_gh_link} | {resource_format} |\n"
+            f"| [{title_clean}]({ds_link}) | {py_colab_link} | {py_renku_link} | {py_gh_link} | {r_gh_link} | {resource_format} |\n"
         )
 
     md_doc = "".join(md_doc)
