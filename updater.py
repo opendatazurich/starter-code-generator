@@ -69,9 +69,9 @@ RESOURCE_COLS_TO_KEEP = [
 ]
 
 # renku constants
-RENKU_NAMESPACE = "cramakri"
-RENKU_PROJECT_SLUG = "opendata-zh"
-RENKU_SESSION_ID = "01JM9MW8RWS0FPEA9SGKWJDV64"
+RENKU_NAMESPACE = "opendatazurich"
+RENKU_PROJECT_SLUG = "starter-code"
+RENKU_SESSION_ID = "01JZT3TY89P6YRMMJXV9PEDQZW"
 
 # FUNCTIONS ------------------------------------------------------------------ #
 
