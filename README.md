@@ -25,6 +25,18 @@ The script works with templates that are stored in – you guessed it – `_temp
 
 The code works out of the box with the [metadata API of data.stadt-zuerich.ch](https://data.stadt-zuerich.ch/api/3/action/current_package_list_with_resources). 
 
+Here's an overview:
+```mermaid
+flowchart TD
+    updater(Startercode Generator<br>updater.py) -->|GitHub Actions| getMetadata(Get metadata from<br>data.stadt-zuerich.ch)
+    getMetadata --> makeNotebooks(Generate Jupyter Notebooks <BR>& R-Markdown)
+    makeNotebooks --> pushRepo(Push to<BR>Startercode Repo)
+    pushRepo --> githubio(Startercode website<br>opendatazurich.github.io/starter-code)
+
+    makeNotebooks --> onlineAnalysis(Online analysis URLs for<br>Colab & Renku)
+    onlineAnalysis -.-|Not yet implemented| ogdCatalog(Include URLs in<br>OGD catalog)
+```
+
 
 ## How to adapt the code to your needs?
 -   Clone this repo and commit/push it to your GitHub account.
