@@ -7,8 +7,8 @@
 This repository provides currently 2 x {{ DATASET_COUNT }} code files (1 x R, 1 x Python) for all data sets (*«resources»*) that are available on [{{ PROVIDER }}]({{ DATA_PORTAL }}) and that contain one or several CSV/parquet/geojson distributions.
 
 - The code files are set with relevant metadata, descriptions, data links, and some starter code. 
-- The idea of this experiment is **that you immediately can start analyzing the data with R or Python.** 
-- You can **open the Python notebooks with one click in Google Colab too.**
+- The idea of this experiment is **that you immediately can start analyzing the data with R, Python or SQL.** 
+- You don't even need to have a local installation. Just klick on the links for Colab, Renku or SQl-Workbench to **start analyzing in your browser**.
 
 ⚠️ **Note**: 
 - **GitHub unfortunately doesn't render larger markdown files full length in the repo view.** The GitHub page aka «overview website» (link above) renders the list properly. 
