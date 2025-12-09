@@ -71,7 +71,7 @@ RESOURCE_COLS_TO_KEEP = [
 # renku constants
 RENKU_NAMESPACE = "opendatazurich"
 RENKU_PROJECT_SLUG = "starter-code"
-RENKU_SESSION_ID = "01JZT3TY89P6YRMMJXV9PEDQZW"
+RENKU_SESSION_ID = "01KC1K2SN2GAQSGJ3NY602EA95"
 RENKU_SESSION_ID_R = "01K7HKDF1S55RHSZPCK4SHTX1H"
 
 # FUNCTIONS ------------------------------------------------------------------ #
