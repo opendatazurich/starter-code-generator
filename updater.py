@@ -74,6 +74,10 @@ RENKU_PROJECT_SLUG = "starter-code"
 RENKU_SESSION_ID = "01KC1K2SN2GAQSGJ3NY602EA95"
 RENKU_SESSION_ID_R = "01K7HKDF1S55RHSZPCK4SHTX1H"
 
+DATASETS_TO_EXCLUDE = [
+    "vbz_fahrzeiten_ogd_2022",
+]
+
 # FUNCTIONS ------------------------------------------------------------------ #
 
 
@@ -415,12 +419,29 @@ def prepare_for_ckan(df):
         print(url_string)
         #update_ckan_metadata(url_string)
 
+def exclude_datasets(df: pd.DataFrame, datasets_to_exclude: list):
+    """
+    This is a function to explicitly exclude datasets. 
+    These datasets may have valid data formats, but we don't them in the starter code list for some reason.
+    Filtering for valid datasets and resources is done in another function (filter_resources). 
+    
+    :param df: Dataframe with datasets or resources
+    :param datasets_to_exclude: List or iterable with the dataset slug, we want to exclude
+
+    :returns df: There filtered dataframe
+    """
+    if len(datasets_to_exclude) > 0:
+        print("Exclude Datasets", datasets_to_exclude)
+        df = df[~df["name"].isin(datasets_to_exclude)]
+
+    return df
 
 # CREATE CODE FILES ---------------------------------------------------------- #
 
 all_packages = get_full_package_list()
 
 df = dataset_to_resource(all_packages)
+df = exclude_datasets(df, DATASETS_TO_EXCLUDE)
 df = clean_features(df)
 df = filter_resources(df)
 print("Number of resources", df.shape[0])
