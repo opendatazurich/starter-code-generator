@@ -98,23 +98,6 @@ read_geodata <- function(url, typename) {
 df <- read_geodata(url, typename)
 ```
 
-if the approach above does not work, try using [ows4r](https://eblondel.github.io/ows4R/); however, this needs to be installed first
-```{r eval=FALSE}
-# install.packages("ows4R")
-library(ows4R)
-
-# WFS-Client erstellen
-url_geoportal <- get_geoportal_url(url)
-wfs_client <- WFSClient$new(url_geoportal, "1.1.0")
-
-# Verfügbare Feature-Typen anzeigen
-wfs_client$getFeatureTypes(pretty = TRUE)
-
-typenames <- wfs_client$getFeatureTypes(pretty = TRUE) |> 
-  dplyr::pull(name)
-
-df <- read_geodata(url, typenames[[1]])
-```
 
 # Analyze the data
 
