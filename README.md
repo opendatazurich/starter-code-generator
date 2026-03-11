@@ -32,9 +32,6 @@ flowchart TD
     getMetadata --> makeNotebooks(Generate Jupyter Notebooks <BR>& R-Markdown)
     makeNotebooks --> pushRepo(Push to<BR>Startercode Repo)
     pushRepo --> githubio(Startercode website<br>opendatazurich.github.io/starter-code)
-
-    makeNotebooks --> onlineAnalysis(Online analysis URLs for<br>Colab & Renku)
-    onlineAnalysis -.-|Not yet implemented| ogdCatalog(Include URLs in<br>OGD catalog)
 ```
 
 
@@ -75,6 +72,36 @@ conda env update --file environment.yml  --prune
 # To delete the environment:
 conda remove --name opendatazurich --all
 ```
+
+## Setup for Renku
+
+This starter code setup uses [renku](https://renkulab.io/) to provide free access to online analysis in Python and R. To make this available to all users without requiring them to create an account, you need to set up custom launchers in renku. 
+
+> Note: At OpenDataZurich, we use custom launchers with specifically built containers to fit our needs. If you don't use the functionality for geo datasets you might not need this. In that case you can simply use a [launcher with one of the prebuilt environments](https://docs.renkulab.io/en/latest/docs/users/getting-started/launch-session) from renku.
+
+### Python Launcher
+
+To fully recreate the Python project you need 4 things:
+
+1. **[Github Repo](https://github.com/opendatazurich/opendatazurich_renku)**: This repo contains the necessary information to build a container that can be used in renku. It also contains a Github Actions Workflow that builds the container on Github. We do not use the later anymore. Instead we build the container in renku because it reduces the start up time.
+
+2. **[Renku "startercode builder"](https://renkulab.io/p/opendatazurich/starter-code#launcher-01KC1JJ533HN1HVJX3FTBZYTXJ)**: To build an store the container in renku from the Github repo, you need a separate launcher of the type **Create from code**. Here are the settings for the builder: ![](images/startercode_builder_settings.png)<BR>  You will have to change the **Build from code repository** URL, if you want to use your own custom container. The **Container Image** URL will be available, as soon as the build is finished.
+
+3. **Renku Session Launcher ["starter code python"](https://renkulab.io/p/opendatazurich/starter-code#launcher-01KC1K2SN2GAQSGJ3NY602EA95)**: To start the container you need to create one more launcher with an **External environment**. Most importantly you will need to copy the **Container image** URL from the builder and use it here. You also need to set the environment variables `PACKAGE_ID` and `RESOURCE_ID`. Set both of them to `NONE`. The remaining parameters are as follows:<BR>  ![](images/startercode_python_settings.png) 
+
+4. **Renku Session ID**: Once your launcher is configured, you can copy the launcher ID, for example by clicking on **Share session launch link**: ![](images/startercode_session_launch.png)<BR>  The session ID is the part between `sessions/` and `/start` and looks for example like this `01JZT3TY89P6YRMMJXV9PEDQZW`. Insert this ID as the constant `RENKU_SESSION_ID` in to [updater.py](updater.py):<BR>  ![](images/startercode_renku_constants.png)
+
+### R Launcher
+
+The setup for the R-Launcher is similar, but a little simpler than the Python setup. You need:
+
+1. **[Github Repo](https://github.com/opendatazurich/opendatazurich_renku_r)**: This repo contains the necessary information to build a container that can be used in renku. It also contains a Github Actions Workflow that builds the container on Github. You can fork the repo, and Github will build the container automatically. Make sure that the container package is **public**. Once the container is built, you can copy the latest container url from the package page: https://github.com/opendatazurich/opendatazurich_renku_r/pkgs/container/opendatazurich_renku_r ![](images/startercode_r_container_url.png)
+
+2. **Renku Session Launcher ["startercode_r"](https://renkulab.io/p/opendatazurich/starter-code#launcher-01K7HKDF1S55RHSZPCK4SHTX1H)**: Create a new session launcher in renku with an **External environment**. Most importantly you will need to copy the **Container image** URL from Github and use it here. You also need to set the environment variables `PACKAGE_ID` and `RESOURCE_ID`. Set both of them to `NONE`. The remaining parameters are as follows:<BR>  ![](images/startercode_r_settings.png)
+
+3. **Renku Session ID**: When your launcher is configured, you can copy the launcher ID, for example by clicking on **Share session launch link**: ![](images/startercode_session_launch.png)<BR>  The session ID is the part between `sessions/` and `/start` and looks for example like this `01JZT3TY89P6YRMMJXV9PEDQZW`. Insert the ID as the constant `RENKU_SESSION_ID_R` in to [updater.py](updater.py):<BR>  ![](images/startercode_renku_constants.png)
+
+
 ## Good to know
 - [Patrick](https://github.com/rnckp)'s code for opendata.swiss, which can be found [here](https://github.com/rnckp/starter-code-opendataswiss-gh), served as a template for this project. Thank you very much for the feedback and useful tips!
 - The Team Data of the Statistical Office of the Canton Zürich use the same code and workflow [here](https://github.com/openZH/startercode-generator_openZH).
