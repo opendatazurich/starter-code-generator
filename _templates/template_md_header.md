@@ -4,7 +4,7 @@
 
 - The code files are **set with relevant metadata, descriptions, data links, and some starter code.** 
 - The idea of this experiment is **that you immediately can start analyzing the data with R, Python or SQL.** 
-- You don't even need to have a local installation. Just klick on the links for Colab, Renku or SQl-Workbench to **start analyzing in your browser**.
+- You don't even need to have a local installation. Just klick on the links for Colab, Renku or SQL-Workbench to **start analyzing in your browser**.
 
 ⚠️ **Note**: To **download individual files from GitHub you need to switch to the file's `RAW` view and then `Right-Click-Save-As`.** Only so you get the proper file format rather than the HTML that GitHub yields.
 
@@ -17,8 +17,5 @@ Feedback is always very welcome – simply open an issue or contact us at [opend
 <sub>Latest update: **{{ TODAY_DATE }}**</sub><br>
 <sub>For all data licenses please refer to each data set's link (provided in list as well as in the notebooks).</sub>
 
-### Renku (Jupyter Lab / RStudio): [![launch - renku](https://renkulab.io/renku-badge.svg)](https://renkulab.io/v2/projects/{{ GITHUB_ACCOUNT_REPO }})
-### Jupyter Lab: [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/{{ GITHUB_ACCOUNT_REPO }}/main?urlpath=lab)
-### RStudio Server: [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/{{ GITHUB_ACCOUNT_REPO }}/main?urlpath=rstudio)
 
 
