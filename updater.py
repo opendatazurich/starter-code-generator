@@ -20,6 +20,23 @@ CKAN_API_LINK = (
     "https://data.stadt-zuerich.ch/api/3/action/current_package_list_with_resources"
 )
 
+# User-Agent strings so requests are traceable in the data portal logs.
+# Generator: used by this script when fetching the catalogue.
+# Notebook: written into the generated Python/R notebooks so user requests
+# are distinguishable from the nightly generator run.
+USER_AGENT_GENERATOR = (
+    "OpenDataZurich-StarterCode-Generator/1.0 "
+    "(+https://github.com/opendatazurich/starter-code-generator)"
+)
+USER_AGENT_NOTEBOOK_PY = (
+    "OpenDataZurich-StarterCode-Notebook/1.0 "
+    "(lang=python; +https://github.com/opendatazurich/starter-code)"
+)
+USER_AGENT_NOTEBOOK_R = (
+    "OpenDataZurich-StarterCode-Notebook/1.0 "
+    "(lang=r; +https://github.com/opendatazurich/starter-code)"
+)
+
 # Set constants in regard to GitHub account and repo.
 GITHUB_ACCOUNT = "opendatazurich"
 REPO_NAME = "starter-code"
@@ -86,10 +103,12 @@ def get_full_package_list(limit=500, sleep=2):
     """Get full package list from CKAN API"""
     offset = 0
     frames = []
+    session = requests.Session()
+    session.headers.update({"User-Agent": USER_AGENT_GENERATOR})
     while True:
         print(f"{offset} packages retrieved.")
         url = CKAN_API_LINK + f"?limit={limit}&offset={offset}"
-        res = requests.get(url)
+        res = session.get(url)
         data = json.loads(res.content)
         if data["result"] == []:
             break
@@ -244,6 +263,8 @@ def create_python_notebooks(data, notebook_template):
         file_url = data.loc[idx,PREFIX_RESOURCE_COLS+"url"]
         py_nb = py_nb.replace("{{ FILE_URL }}", file_url)
 
+        py_nb = py_nb.replace("{{ USER_AGENT }}", USER_AGENT_NOTEBOOK_PY)
+
         py_nb = json.loads(py_nb, strict=False)
         # Save to disk.
         with open(
@@ -290,6 +311,8 @@ def create_rmarkdown(data, notebook_template):
         # Get file URL and format
         file_url = data.loc[idx, PREFIX_RESOURCE_COLS + "url"]
         rmd = rmd.replace("{{ FILE_URL }}", file_url)
+
+        rmd = rmd.replace("{{ USER_AGENT }}", USER_AGENT_NOTEBOOK_R)
 
         # Save to disk.
         with open(
