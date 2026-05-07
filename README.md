@@ -52,6 +52,22 @@ flowchart TD
 -   Manually trigger the GitHub Action workflow and check the results.
 -   Do not forget to add a license to your second repo.
 
+## User-Agent
+
+All HTTP requests carry a custom `User-Agent` header so that traffic from the generator and from generated notebooks can be identified in the data portal access logs. Three values are defined as constants at the top of [updater.py](updater.py) — adjust them if you fork this project:
+
+- `USER_AGENT_GENERATOR` — used by `updater.py` itself when fetching the CKAN catalogue.
+- `USER_AGENT_NOTEBOOK_PY` / `USER_AGENT_NOTEBOOK_R` — substituted into the `{{ USER_AGENT }}` placeholder when notebooks are rendered, so Python and R notebook traffic is distinguishable.
+
+The format follows RFC 7231: `Product/Version (comment)`, with a `+URL` pointing back to the source repo. Bump the version when you change request behaviour in a way operators of the data portal might care about.
+
+How it gets applied in the generated notebooks:
+
+- **Python (tabular)**: passed as `storage_options={"User-Agent": ...}` to `pd.read_csv` / `pd.read_parquet` (uses fsspec for HTTP fetches).
+- **Python (geo)**: passed as `headers=` to the `requests.get` calls against the WFS endpoint.
+- **R (tabular)**: set globally via `options(HTTPUserAgent = ...)`, which curl-based readers (readr, arrow) pick up.
+- **R (geo)**: same `options()` call plus `Sys.setenv(GDAL_HTTP_USERAGENT = ...)` (for `sf::st_read`, which fetches via GDAL/vsicurl) and an explicit `req_user_agent()` on the httr2 pipeline.
+
 ## Dependencies
 
 The repository contains an ```environment.yml``` and an ```requirements.txt``` file,

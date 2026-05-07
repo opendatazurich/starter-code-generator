@@ -17,3 +17,5 @@ test_script.ipynb
 Pipfile
 Pipfile.lock
 .Rproj.user
+
+.claude

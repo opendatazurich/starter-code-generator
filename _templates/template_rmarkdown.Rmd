@@ -25,6 +25,12 @@ library(skimr)
 library(tidyverse)
 ```
 
+```{r}
+# Identifies requests from this notebook in the OpenDataZurich access logs.
+# Picked up by curl-based readers (readr, arrow) via base R's HTTPUserAgent option.
+options(HTTPUserAgent = "{{ USER_AGENT }}")
+```
+
 # Load the data
 
 ```{r}
