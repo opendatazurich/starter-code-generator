@@ -2,6 +2,7 @@
 title: "{{ DOCUMENT_TITLE }}"
 date: "{{ TODAY_DATE }}"
 output: html_document
+editor: visual
 ---
 
 ## Dataset: {{ DATASET_TITLE }}
