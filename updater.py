@@ -399,7 +399,7 @@ def create_overview(data, header):
         py_colab_link = f"[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)]({baselink_py_colab}{filename}.ipynb)"
         py_binder_link = f"[![Jupyter Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/{GITHUB_ACCOUNT}/{REPO_NAME}/{REPO_BRANCH}?filepath={REPO_PYTHON_OUTPUT}{filename}.ipynb)"
         py_renku_link = f"[![Python - renku](https://renkulab.io/renku-badge.svg)]({baselink_py_renku}start?PACKAGE_ID={data.loc[idx, 'name']}&RESOURCE_ID={data.loc[idx, PREFIX_RESOURCE_COLS+'id']})"
-        r_renku_link = f"[![R - renku](https://renkulab.io/renku-badge.svg)]({baselink_r_renku}start?PACKAGE_ID={data.loc[idx, 'name']})"
+        r_renku_link = f"[![R - renku](https://renkulab.io/renku-badge.svg)]({baselink_r_renku}start?PACKAGE_ID={data.loc[idx, 'name']}&RESOURCE_ID={data.loc[idx, PREFIX_RESOURCE_COLS+'id']})"
 
 
         fileformat = data.loc[idx,PREFIX_RESOURCE_COLS+'format'].lower()
