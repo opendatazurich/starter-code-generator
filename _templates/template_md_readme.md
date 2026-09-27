@@ -8,7 +8,7 @@ This repository provides currently 2 x {{ DATASET_COUNT }} code files (1 x R, 1 
 
 - The code files are set with relevant metadata, descriptions, data links, and some starter code. 
 - The idea of this experiment is **that you immediately can start analyzing the data with R, Python or SQL.** 
-- You don't even need to have a local installation. Just klick on the links for Colab, Renku or SQl-Workbench to **start analyzing in your browser**.
+- You don't even need to have a local installation. Just click on the links for Colab, Renku or SQL-Workbench to **start analyzing in your browser**.
 
 ⚠️ **Note**: 
 - **GitHub unfortunately doesn't render larger markdown files full length in the repo view.** The GitHub page aka «overview website» (link above) renders the list properly. 
@@ -17,9 +17,9 @@ This repository provides currently 2 x {{ DATASET_COUNT }} code files (1 x R, 1 
 
 Feedback is always very welcome – simply open an issue or contact us at [opendata@zuerich.ch](mailto://opendata@zuerich.ch)! 🙌
 
-🌻 Our thanks for the [template](https://github.com/rnckp/starter-code-opendataswiss-gh) and help goes to [Patrick Arnecke](https://github.com/rnckp) from the Statistical Office of the Canton of Zurich!
+🌻 Our thanks for the [template](https://github.com/rnckp/starter-code-opendataswiss-gh) and help go to [Patrick Arnecke](https://github.com/rnckp) from the Statistical Office of the Canton of Zurich!
 
 <sub>Latest update: **{{ TODAY_DATE }}**</sub><br>
-<sub>For all data licenses please refer to each data set's link (provided in list as well as in the notebooks).</sub>
+<sub>For all data licenses please refer to each data set's link (provided in the list as well as in the notebooks).</sub>
 
 
