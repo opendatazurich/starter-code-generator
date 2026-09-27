@@ -3,7 +3,7 @@ run-name: autoupdater
 on:
   workflow_dispatch:
   schedule:
-    - cron:  '35 3 * * 0' # 03:35 every sunday
+    - cron:  '35 3 * * 0' # 03:35 every Sunday
 
 jobs:
   python_script:

@@ -17,9 +17,9 @@ This repository provides currently 2 x 1195 code files (1 x R, 1 x Python) for a
 
 Feedback is always very welcome – simply open an issue or contact us at [opendata@zuerich.ch](mailto://opendata@zuerich.ch)! 🙌
 
-🌻 Our thanks for the [template](https://github.com/rnckp/starter-code-opendataswiss-gh) and help goes to [Patrick Arnecke](https://github.com/rnckp) from the Statistical Office of the Canton of Zurich!
+🌻 Our thanks for the [template](https://github.com/rnckp/starter-code-opendataswiss-gh) and help go to [Patrick Arnecke](https://github.com/rnckp) from the Statistical Office of the Canton of Zurich!
 
-<sub>Latest update: **2026-10-13 14:21:58**</sub><br>
-<sub>For all data licenses please refer to each data set's link (provided in list as well as in the notebooks).</sub>
+<sub>Latest update: **2025-02-11 13:44:30**</sub><br>
+<sub>For all data licenses please refer to each data set's link (provided in the list as well as in the notebooks).</sub>
 
 
