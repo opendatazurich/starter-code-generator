@@ -4,7 +4,7 @@
 
 
 ## Overview
-This repo provides a Python script that generates starter code notebooks from a metadata JSON of open data catalogue. You can execute the script manually or trigger it regularly (e.g. every night) with a GitHub Action that we provide here too and by that create code notebooks for every dataset in your data catalogue. 
+This repo provides a Python script that generates starter code notebooks from a metadata JSON of an open data catalogue. You can execute the script manually or trigger it regularly (e.g. every night) with a GitHub Action that we provide here too and by that create code notebooks for every dataset in your data catalogue. 
 
 The script also generates a README file that contains a list of all datasets and links to the corresponding notebooks that you can use as an overview for your users. You can expose this easily as a website with GitHub Pages.
 
@@ -12,7 +12,7 @@ The execution of the script is lightweight and takes only a couple of minutes de
 
 Your users get notebooks that are specifically tailored for every dataset. They are already set with the most recent data set metadata and code snippets. Your user can start their analysis for your data sets right away with just a couple of clicks or even just one single click if they use Google Colab.
 
-This repo here is setup so that it generates the starter code [in this repo](https://github.com/opendatazurich/starter-code) and creates [this overview page here](https://opendatazurich.github.io/starter-code).
+This repo here is set up so that it generates the starter code [in this repo](https://github.com/opendatazurich/starter-code) and creates [this overview page here](https://opendatazurich.github.io/starter-code).
 
 
 ## How does it work?
@@ -70,7 +70,7 @@ How it gets applied in the generated notebooks:
 
 ## Dependencies
 
-The repository contains an ```environment.yml``` and an ```requirements.txt``` file,
+The repository contains an ```environment.yml``` and a ```requirements.txt``` file,
 which can be utilized by
 [conda](https://docs.conda.io/projects/conda/en/stable/user-guide/install/index.html)
 or pip. To use conda to install the dependencies do the following:
@@ -82,7 +82,7 @@ conda env create --file environment.yml
 # To activate the environment:
 conda activate opendatazurich
 
-# To update the environment after change of the environment.yml
+# To update the environment after a change to the environment.yml
 conda env update --file environment.yml  --prune
 
 # To delete the environment:
@@ -99,13 +99,13 @@ This starter code setup uses [renku](https://renkulab.io/) to provide free acces
 
 To fully recreate the Python project you need 4 things:
 
-1. **[Github Repo](https://github.com/opendatazurich/opendatazurich_renku)**: This repo contains the necessary information to build a container that can be used in renku. It also contains a Github Actions Workflow that builds the container on Github. We do not use the later anymore. Instead we build the container in renku because it reduces the start up time.
+1. **[Github Repo](https://github.com/opendatazurich/opendatazurich_renku)**: This repo contains the necessary information to build a container that can be used in renku. It also contains a Github Actions Workflow that builds the container on Github. We do not use the latter anymore. Instead we build the container in renku because it reduces the startup time.
 
-2. **[Renku "startercode builder"](https://renkulab.io/p/opendatazurich/starter-code#launcher-01KC1JJ533HN1HVJX3FTBZYTXJ)**: To build an store the container in renku from the Github repo, you need a separate launcher of the type **Create from code**. Here are the settings for the builder: ![](images/startercode_builder_settings.png)<BR>  You will have to change the **Build from code repository** URL, if you want to use your own custom container. The **Container Image** URL will be available, as soon as the build is finished.
+2. **[Renku "startercode builder"](https://renkulab.io/p/opendatazurich/starter-code#launcher-01KC1JJ533HN1HVJX3FTBZYTXJ)**: To build and store the container in renku from the Github repo, you need a separate launcher of the type **Create from code**. Here are the settings for the builder: ![](images/startercode_builder_settings.png)<BR>  You will have to change the **Build from code repository** URL, if you want to use your own custom container. The **Container Image** URL will be available, as soon as the build is finished.
 
 3. **Renku Session Launcher ["starter code python"](https://renkulab.io/p/opendatazurich/starter-code#launcher-01KC1K2SN2GAQSGJ3NY602EA95)**: To start the container you need to create one more launcher with an **External environment**. Most importantly you will need to copy the **Container image** URL from the builder and use it here. You also need to set the environment variables `PACKAGE_ID` and `RESOURCE_ID`. Set both of them to `NONE`. The remaining parameters are as follows:<BR>  ![](images/startercode_python_settings.png) 
 
-4. **Renku Session ID**: Once your launcher is configured, you can copy the launcher ID, for example by clicking on **Share session launch link**: ![](images/startercode_session_launch.png)<BR>  The session ID is the part between `sessions/` and `/start` and looks for example like this `01JZT3TY89P6YRMMJXV9PEDQZW`. Insert this ID as the constant `RENKU_SESSION_ID` in to [updater.py](updater.py):<BR>  ![](images/startercode_renku_constants.png)
+4. **Renku Session ID**: Once your launcher is configured, you can copy the launcher ID, for example by clicking on **Share session launch link**: ![](images/startercode_session_launch.png)<BR>  The session ID is the part between `sessions/` and `/start` and looks for example like this `01JZT3TY89P6YRMMJXV9PEDQZW`. Insert this ID as the constant `RENKU_SESSION_ID` into [updater.py](updater.py):<BR>  ![](images/startercode_renku_constants.png)
 
 ### R Launcher
 
@@ -115,7 +115,7 @@ The setup for the R-Launcher is similar, but a little simpler than the Python se
 
 2. **Renku Session Launcher ["startercode_r"](https://renkulab.io/p/opendatazurich/starter-code#launcher-01K7HKDF1S55RHSZPCK4SHTX1H)**: Create a new session launcher in renku with an **External environment**. Most importantly you will need to copy the **Container image** URL from Github and use it here. You also need to set the environment variables `PACKAGE_ID` and `RESOURCE_ID`. Set both of them to `NONE`. The remaining parameters are as follows:<BR>  ![](images/startercode_r_settings.png)
 
-3. **Renku Session ID**: When your launcher is configured, you can copy the launcher ID, for example by clicking on **Share session launch link**: ![](images/startercode_session_launch.png)<BR>  The session ID is the part between `sessions/` and `/start` and looks for example like this `01JZT3TY89P6YRMMJXV9PEDQZW`. Insert the ID as the constant `RENKU_SESSION_ID_R` in to [updater.py](updater.py):<BR>  ![](images/startercode_renku_constants.png)
+3. **Renku Session ID**: When your launcher is configured, you can copy the launcher ID, for example by clicking on **Share session launch link**: ![](images/startercode_session_launch.png)<BR>  The session ID is the part between `sessions/` and `/start` and looks for example like this `01JZT3TY89P6YRMMJXV9PEDQZW`. Insert the ID as the constant `RENKU_SESSION_ID_R` into [updater.py](updater.py):<BR>  ![](images/startercode_renku_constants.png)
 
 
 ## Good to know

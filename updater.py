@@ -447,13 +447,13 @@ def prepare_for_ckan(df):
 def exclude_datasets(df: pd.DataFrame, datasets_to_exclude: list):
     """
     This is a function to explicitly exclude datasets. 
-    These datasets may have valid data formats, but we don't them in the starter code list for some reason.
+    These datasets may have valid data formats, but we don't want them in the starter code list for some reason.
     Filtering for valid datasets and resources is done in another function (filter_resources). 
     
     :param df: Dataframe with datasets or resources
     :param datasets_to_exclude: List or iterable with the dataset slug, we want to exclude
 
-    :returns df: There filtered dataframe
+    :returns df: The filtered dataframe
     """
     if len(datasets_to_exclude) > 0:
         print("Exclude Datasets", datasets_to_exclude)
@@ -464,7 +464,7 @@ def exclude_datasets(df: pd.DataFrame, datasets_to_exclude: list):
 
 def encode_url_sqlworkbench(url):
     """
-    When sharing queires sql-workbench.com it encodes download url.
+    When sharing queries, sql-workbench.com encodes the download url.
     Most of it is standard, but there are also special cases:
     For example, "-" (minus) gets encoded to "%20"
     
@@ -502,7 +502,7 @@ create_rmarkdown(df_geodata, TEMPLATE_RMARKDOWN_GEO)
 
 print(df)
 
-print("Create overview an readme files")
+print("Create overview and readme files")
 header = get_header(dataset_count=len(df))
 create_readme(dataset_count=len(df))
 create_overview(df, header)
