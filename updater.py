@@ -362,7 +362,7 @@ def create_overview(data, header):
     """Create README with link table"""
     baselink_r_gh = f"https://github.com/{GITHUB_ACCOUNT}/{REPO_NAME}/blob/{REPO_BRANCH}/{REPO_RMARKDOWN_OUTPUT}/"
     baselink_py_gh = f"https://github.com/{GITHUB_ACCOUNT}/{REPO_NAME}/blob/{REPO_BRANCH}/{REPO_PYTHON_OUTPUT}/"
-    baselink_py_colab = f"https://githubtocolab.com/{GITHUB_ACCOUNT}/{REPO_NAME}/blob/{REPO_BRANCH}/{REPO_PYTHON_OUTPUT}/"
+    baselink_py_colab = f"https://colab.research.google.com/github/{GITHUB_ACCOUNT}/{REPO_NAME}/blob/{REPO_BRANCH}/{REPO_PYTHON_OUTPUT}/"
     baselink_py_renku = f"https://renkulab.io/p/{RENKU_NAMESPACE}/{RENKU_PROJECT_SLUG}/sessions/{RENKU_SESSION_ID}/"
     baselink_r_renku = f"https://renkulab.io/p/{RENKU_NAMESPACE}/{RENKU_PROJECT_SLUG}/sessions/{RENKU_SESSION_ID_R}/"
 
@@ -419,30 +419,6 @@ def create_overview(data, header):
         file.write(md_doc)
 
 
-def update_ckan_metadata(text, ckan_field='description' ,env='int'):
-    """
-    Use CKAN API to update a field in the resource metadata
-    """
-    pass
-
-
-def prepare_for_ckan(df):
-    """
-    Extract relevant data for metadata update in ckan, like:
-    - resource ids
-    - links to online tools like colab, binder, renku
-    """
-    subset_cols = ['name', PREFIX_RESOURCE_COLS+'id',PREFIX_RESOURCE_COLS+'package_id', PREFIX_RESOURCE_COLS+'url']
-    df = df[subset_cols].copy()
-    
-    # badges with url links
-    df['colab_url'] = "[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://githubtocolab.com/"+GITHUB_ACCOUNT+"/"+REPO_NAME+"/blob/"+REPO_BRANCH+"/"+REPO_PYTHON_OUTPUT+df['name']+"_"+df[PREFIX_RESOURCE_COLS+"id"]+".ipynb)"
-    df['binder_py_url'] = "[![Jupyter Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/"+GITHUB_ACCOUNT+"/"+REPO_NAME+"/"+REPO_BRANCH+"?filepath="+REPO_PYTHON_OUTPUT+df['name']+"_"+df[PREFIX_RESOURCE_COLS+"id"]+".ipynb)"
-
-    for index, row in df.iterrows():
-        url_string = "Datensatz direkt online analysieren mit " + row['colab_url'] + " " + row['binder_py_url']
-        print(url_string)
-        #update_ckan_metadata(url_string)
 
 def exclude_datasets(df: pd.DataFrame, datasets_to_exclude: list):
     """
