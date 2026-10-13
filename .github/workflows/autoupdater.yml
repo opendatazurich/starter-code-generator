@@ -14,13 +14,17 @@ jobs:
         with:
           token: ${{ secrets.STARTER_CODE_TOKEN }}
 
-      - uses: actions/setup-python@v6
+      - name: Install uv
+        uses: astral-sh/setup-uv@v9.0.0
         with:
-          python-version: '3.13'
-          cache: 'pip' # caching pip dependencies
+          python-version: '3.14'
+          enable-cache: true
 
-      - run: pip install -r requirements.txt
-      - run: python updater.py
+      - name: Install project
+        run: uv sync --locked
+
+      - name: Run generator
+        run: uv run python updater.py
 
       - name: Push generated files to target repository
         uses: cpina/github-action-push-to-another-repository@main

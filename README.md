@@ -70,24 +70,22 @@ How it gets applied in the generated notebooks:
 
 ## Dependencies
 
-The repository contains an ```environment.yml``` and an ```requirements.txt``` file,
-which can be utilized by
-[conda](https://docs.conda.io/projects/conda/en/stable/user-guide/install/index.html)
-or pip. To use conda to install the dependencies do the following:
+The repository is managed with [uv](https://docs.astral.sh/uv/), a fast Python
+package and project manager. Dependencies are declared in
+[`pyproject.toml`](pyproject.toml) and locked in [`uv.lock`](uv.lock) for
+reproducible runs.
 
 ```bash
-# To create the environment:
-conda env create --file environment.yml
+# Install dependencies (creates .venv and installs from uv.lock):
+uv sync
 
-# To activate the environment:
-conda activate opendatazurich
-
-# To update the environment after change of the environment.yml
-conda env update --file environment.yml  --prune
-
-# To delete the environment:
-conda remove --name opendatazurich --all
+# Run the generator inside the synced environment:
+uv run python updater.py
 ```
+
+`uv` can be installed with `curl -LsSf https://astral.sh/uv/install.sh | sh`.
+Python version is pinned in [`.python-version`](.python-version). After changing
+anything in `pyproject.toml`, run `uv sync` again to update `uv.lock`.
 
 ## Setup for Renku
 
