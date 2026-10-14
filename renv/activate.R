@@ -493,7 +493,7 @@ local({
   
   }
   
-  # Add Sha to DESCRIPTION. This is stop gap until #890, after which we
+  # Add Sha to DESCRIPTION. This is a stopgap until #890, after which we
   # can use renv::install() to fully capture metadata.
   renv_bootstrap_download_augment <- function(destfile) {
     sha <- renv_bootstrap_git_extract_sha1_tar(destfile)

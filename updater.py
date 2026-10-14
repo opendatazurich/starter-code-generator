@@ -362,7 +362,7 @@ def create_overview(data, header):
     """Create README with link table"""
     baselink_r_gh = f"https://github.com/{GITHUB_ACCOUNT}/{REPO_NAME}/blob/{REPO_BRANCH}/{REPO_RMARKDOWN_OUTPUT}/"
     baselink_py_gh = f"https://github.com/{GITHUB_ACCOUNT}/{REPO_NAME}/blob/{REPO_BRANCH}/{REPO_PYTHON_OUTPUT}/"
-    baselink_py_colab = f"https://githubtocolab.com/{GITHUB_ACCOUNT}/{REPO_NAME}/blob/{REPO_BRANCH}/{REPO_PYTHON_OUTPUT}/"
+    baselink_py_colab = f"https://colab.research.google.com/github/{GITHUB_ACCOUNT}/{REPO_NAME}/blob/{REPO_BRANCH}/{REPO_PYTHON_OUTPUT}/"
     baselink_py_renku = f"https://renkulab.io/p/{RENKU_NAMESPACE}/{RENKU_PROJECT_SLUG}/sessions/{RENKU_SESSION_ID}/"
     baselink_r_renku = f"https://renkulab.io/p/{RENKU_NAMESPACE}/{RENKU_PROJECT_SLUG}/sessions/{RENKU_SESSION_ID_R}/"
 
@@ -419,41 +419,17 @@ def create_overview(data, header):
         file.write(md_doc)
 
 
-def update_ckan_metadata(text, ckan_field='description' ,env='int'):
-    """
-    Use CKAN API to update a field in the resource metadata
-    """
-    pass
-
-
-def prepare_for_ckan(df):
-    """
-    Extract relevant data for metadata update in ckan, like:
-    - resource ids
-    - links to online tools like colab, binder, renku
-    """
-    subset_cols = ['name', PREFIX_RESOURCE_COLS+'id',PREFIX_RESOURCE_COLS+'package_id', PREFIX_RESOURCE_COLS+'url']
-    df = df[subset_cols].copy()
-    
-    # badges with url links
-    df['colab_url'] = "[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://githubtocolab.com/"+GITHUB_ACCOUNT+"/"+REPO_NAME+"/blob/"+REPO_BRANCH+"/"+REPO_PYTHON_OUTPUT+df['name']+"_"+df[PREFIX_RESOURCE_COLS+"id"]+".ipynb)"
-    df['binder_py_url'] = "[![Jupyter Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/"+GITHUB_ACCOUNT+"/"+REPO_NAME+"/"+REPO_BRANCH+"?filepath="+REPO_PYTHON_OUTPUT+df['name']+"_"+df[PREFIX_RESOURCE_COLS+"id"]+".ipynb)"
-
-    for index, row in df.iterrows():
-        url_string = "Datensatz direkt online analysieren mit " + row['colab_url'] + " " + row['binder_py_url']
-        print(url_string)
-        #update_ckan_metadata(url_string)
 
 def exclude_datasets(df: pd.DataFrame, datasets_to_exclude: list):
     """
     This is a function to explicitly exclude datasets. 
-    These datasets may have valid data formats, but we don't them in the starter code list for some reason.
+    These datasets may have valid data formats, but we don't want them in the starter code list for some reason.
     Filtering for valid datasets and resources is done in another function (filter_resources). 
     
     :param df: Dataframe with datasets or resources
     :param datasets_to_exclude: List or iterable with the dataset slug, we want to exclude
 
-    :returns df: There filtered dataframe
+    :returns df: The filtered dataframe
     """
     if len(datasets_to_exclude) > 0:
         print("Exclude Datasets", datasets_to_exclude)
@@ -464,7 +440,7 @@ def exclude_datasets(df: pd.DataFrame, datasets_to_exclude: list):
 
 def encode_url_sqlworkbench(url):
     """
-    When sharing queires sql-workbench.com it encodes download url.
+    When sharing queries, sql-workbench.com encodes the download url.
     Most of it is standard, but there are also special cases:
     For example, "-" (minus) gets encoded to "%20"
     
@@ -502,7 +478,7 @@ create_rmarkdown(df_geodata, TEMPLATE_RMARKDOWN_GEO)
 
 print(df)
 
-print("Create overview an readme files")
+print("Create overview and readme files")
 header = get_header(dataset_count=len(df))
 create_readme(dataset_count=len(df))
 create_overview(df, header)
