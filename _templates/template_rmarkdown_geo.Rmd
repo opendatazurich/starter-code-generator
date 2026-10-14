@@ -176,33 +176,6 @@ if (nrow(df) > 0 && ncol(df) > 0) {
 }
 ```
 
-```{r histograms}
-# Plot up to four numeric columns, excluding non-finite values only from plots.
-numeric_names <- names(select(df, where(is.numeric))) |> head(4)
-for (column in numeric_names) {
-  values <- df[[column]]
-  values <- values[is.finite(values)]
-  if (length(values) > 0) {
-    plot <- ggplot(tibble(value = values), aes(x = value)) +
-      geom_histogram(bins = 30, fill = "steelblue", colour = "white") +
-      labs(title = column, x = column, y = "Count")
-    print(plot)
-  }
-}
-```
-
-```{r category-counts}
-# Top 10 values for up to three categorical columns, including missing values.
-categorical_names <- df |>
-  select(where(~ is.character(.x) || is.factor(.x) || is.logical(.x))) |>
-  names() |>
-  head(3)
-for (column in categorical_names) {
-  cat(column, "\n")
-  df |> count(.data[[column]], sort = TRUE) |> head(10) |> print()
-}
-```
-
 # Continue your code here...
 
 ```{r}
